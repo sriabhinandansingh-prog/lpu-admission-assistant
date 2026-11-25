@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LPU Admission Assistant</title>
+<meta name="description" content="Virtual admission counsellor for Lovely Professional University. Courses, eligibility, fees, scholarships, hostel and the admission process.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="mark">LPU</div>
+    <div>
+      <h1>Admission Assistant</h1>
+      <p>Lovely Professional University, Phagwara, Punjab</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button id="settingsBtn" class="ghost" type="button" title="Settings">Settings</button>
+    <button id="clearBtn" class="ghost" type="button" title="Clear chat">Clear</button>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="chat-panel">
+    <div id="messages" class="messages" aria-live="polite"></div>
+
+    <div class="chips" id="chips">
+      <button type="button" data-q="What courses are offered?">Courses</button>
+      <button type="button" data-q="Am I eligible for B.Tech?">Eligibility</button>
+      <button type="button" data-q="What are the fees?">Fees</button>
+      <button type="button" data-q="Tell me about scholarships">Scholarships</button>
+      <button type="button" data-q="How do I apply for admission?">Admission steps</button>
+      <button type="button" data-q="Tell me about the hostel">Hostel</button>
+    </div>
+
+    <form id="composer" class="composer" autocomplete="off">
+      <input id="input" type="text" placeholder="Ask about courses, eligibility, fees, scholarships..." aria-label="Your question">
+      <button type="submit" id="sendBtn">Send</button>
+    </form>
+    <p class="disclaimer">This assistant is a guide only. It does not decide admissions, take payments, or check application status. Final eligibility rests with the university.</p>
+  </section>
+
+  <aside class="side-panel">
+    <div class="card">
+      <h2>Official links</h2>
+      <ul class="linklist">
+        <li><a href="https://www.lpu.in/" target="_blank" rel="noopener">University website</a></li>
+        <li><a href="https://admission.lpu.in/" target="_blank" rel="noopener">Admission portal</a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Modes</h2>
+      <p id="modeStatus" class="muted">Knowledge-base mode. Answers come from <code>data/knowledge.json</code>.</p>
+      <p class="muted small">Add a model key in Settings to let the assistant paraphrase freely. The key stays in this browser only.</p>
+    </div>
+    <div class="card">
+      <h2>Languages</h2>
+      <p class="muted">English, Hindi, Hinglish and Punjabi. The assistant replies in whichever you use.</p>
+    </div>
+  </aside>
+</main>
+
+<dialog id="settingsDialog">
+  <form method="dialog" id="settingsForm">
+    <h2>Settings</h2>
+    <label>
+      API key <span class="muted small">(optional, stored in this browser only)</span>
+      <input type="password" id="apiKey" placeholder="sk-...">
+    </label>
+    <label>
+      Endpoint
+      <input type="url" id="endpoint" placeholder="https://api.openai.com/v1/chat/completions">
+    </label>
+    <label>
+      Model
+      <input type="text" id="model" placeholder="gpt-4o-mini">
+    </label>
+    <p class="muted small">Leave the key empty to stay in knowledge-base mode. Never paste a key you do not own, and never commit one to the repository.</p>
+    <menu>
+      <button value="cancel" class="ghost" type="submit">Cancel</button>
+      <button value="save" id="saveSettings" type="submit">Save</button>
+    </menu>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

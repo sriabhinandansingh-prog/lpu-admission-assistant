@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "session": "2026-27",
+    "verified": false,
+    "note": "Eligibility text here is general guidance only. Fees, cutoffs, deadlines and scholarship slabs are deliberately NOT stored as numbers. Confirm every figure on admission.lpu.in before publishing this site."
+  },
+  "links": {
+    "university": "https://www.lpu.in/",
+    "admissions": "https://admission.lpu.in/"
+  },
+  "university": {
+    "name": "Lovely Professional University (LPU)",
+    "established": 2005,
+    "location": "Phagwara, Punjab, India",
+    "campus": "A large single-campus university on the Jalandhar-Delhi GT Road, with academic blocks, hostels, sports grounds, a shopping area and its own transport network.",
+    "schools": [
+      "Engineering and Technology",
+      "Computer Applications",
+      "Business and Commerce",
+      "Pharmaceutical Sciences",
+      "Law",
+      "Design and Fine Arts",
+      "Sciences",
+      "Humanities and Social Sciences",
+      "Agriculture",
+      "Architecture and Planning",
+      "Hotel Management and Tourism",
+      "Education"
+    ]
+  },
+  "programmes": [
+    {
+      "id": "btech",
+      "name": "B.Tech",
+      "level": "UG",
+      "duration": "4 years",
+      "school": "Engineering and Technology",
+      "eligibility": "Class 12 with Physics, Chemistry and Mathematics (some specialisations accept Physics, Chemistry and Biology or Computer Science). Selection is through LPUNEST or a qualifying national entrance score, followed by counselling.",
+      "subjects": ["Physics", "Chemistry", "Mathematics"],
+      "entrance": "LPUNEST / JEE Main / other accepted national tests"
+    },
+    {
+      "id": "bca",
+      "name": "BCA",
+      "level": "UG",
+      "duration": "3 years",
+      "school": "Computer Applications",
+      "eligibility": "Class 12 in any stream, usually with Mathematics or Computer Science preferred for some specialisations.",
+      "subjects": ["Any stream"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "bba",
+      "name": "BBA",
+      "level": "UG",
+      "duration": "3 years",
+      "school": "Business and Commerce",
+      "eligibility": "Class 12 in any stream from a recognised board.",
+      "subjects": ["Any stream"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "bcom",
+      "name": "B.Com",
+      "level": "UG",
+      "duration": "3 years",
+      "school": "Business and Commerce",
+      "eligibility": "Class 12 in any stream, Commerce preferred.",
+      "subjects": ["Commerce preferred"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "bsc",
+      "name": "B.Sc",
+      "level": "UG",
+      "duration": "3 to 4 years depending on specialisation",
+      "school": "Sciences",
+      "eligibility": "Class 12 in the science stream with the subjects required by the chosen specialisation.",
+      "subjects": ["Physics", "Chemistry", "Biology", "Mathematics as applicable"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "ba",
+      "name": "BA",
+      "level": "UG",
+      "duration": "3 years",
+      "school": "Humanities and Social Sciences",
+      "eligibility": "Class 12 in any stream from a recognised board.",
+      "subjects": ["Any stream"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "bdes",
+      "name": "B.Des",
+      "level": "UG",
+      "duration": "4 years",
+      "school": "Design and Fine Arts",
+      "eligibility": "Class 12 in any stream. A design aptitude test or portfolio may be part of the process for some specialisations.",
+      "subjects": ["Any stream"],
+      "entrance": "LPUNEST or design aptitude assessment"
+    },
+    {
+      "id": "bpharm",
+      "name": "B.Pharm",
+      "level": "UG",
+      "duration": "4 years",
+      "school": "Pharmaceutical Sciences",
+      "eligibility": "Class 12 with Physics and Chemistry, plus either Biology or Mathematics.",
+      "subjects": ["Physics", "Chemistry", "Biology or Mathematics"],
+      "entrance": "LPUNEST or a qualifying national pharmacy entrance score"
+    },
+    {
+      "id": "llb",
+      "name": "LLB",
+      "level": "UG",
+      "duration": "3 years",
+      "school": "Law",
+      "eligibility": "A bachelor's degree in any discipline. Integrated five-year law programmes are also offered after Class 12.",
+      "subjects": ["Graduation in any stream"],
+      "entrance": "LPUNEST or CLAT / other accepted law entrance scores"
+    },
+    {
+      "id": "mba",
+      "name": "MBA",
+      "level": "PG",
+      "duration": "2 years",
+      "school": "Business and Commerce",
+      "eligibility": "A bachelor's degree in any discipline. Selection considers LPUNEST or a national management entrance score, plus group discussion and interview for some specialisations.",
+      "subjects": ["Graduation in any stream"],
+      "entrance": "LPUNEST / CAT / MAT / CMAT / other accepted tests"
+    },
+    {
+      "id": "mca",
+      "name": "MCA",
+      "level": "PG",
+      "duration": "2 years",
+      "school": "Computer Applications",
+      "eligibility": "A bachelor's degree, typically with Mathematics at Class 12 or graduation level depending on the specialisation.",
+      "subjects": ["Graduation", "Mathematics usually required"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "mtech",
+      "name": "M.Tech",
+      "level": "PG",
+      "duration": "2 years",
+      "school": "Engineering and Technology",
+      "eligibility": "A B.Tech or B.E. in a relevant discipline. GATE scores are considered for some specialisations.",
+      "subjects": ["Relevant engineering degree"],
+      "entrance": "LPUNEST / GATE"
+    },
+    {
+      "id": "msc",
+      "name": "M.Sc",
+      "level": "PG",
+      "duration": "2 years",
+      "school": "Sciences",
+      "eligibility": "A B.Sc or equivalent degree in the relevant subject.",
+      "subjects": ["Relevant science degree"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "ma",
+      "name": "MA",
+      "level": "PG",
+      "duration": "2 years",
+      "school": "Humanities and Social Sciences",
+      "eligibility": "A bachelor's degree in a relevant or related discipline.",
+      "subjects": ["Relevant graduation"],
+      "entrance": "LPUNEST or direct admission subject to eligibility"
+    },
+    {
+      "id": "phd",
+      "name": "PhD",
+      "level": "Doctoral",
+      "duration": "Typically 3 years plus",
+      "school": "All schools",
+      "eligibility": "A master's degree in a relevant discipline with the minimum marks set by the university, followed by an entrance test and interview.",
+      "subjects": ["Relevant master's degree"],
+      "entrance": "LPU doctoral entrance test and interview"
+    },
+    {
+      "id": "diploma",
+      "name": "Diploma programmes",
+      "level": "Diploma",
+      "duration": "1 to 3 years depending on programme",
+      "school": "Various",
+      "eligibility": "Class 10 or Class 12 depending on the diploma. Lateral entry routes exist for some programmes.",
+      "subjects": ["Class 10 or 12 as applicable"],
+      "entrance": "Direct admission subject to eligibility"
+    }
+  ],
+  "admission_steps": [
+    "Open the official admission portal at admission.lpu.in.",
+    "Register as a new applicant with your email and mobile number.",
+    "Complete the application form with your personal and academic details.",
+    "Select the programme and specialisation you want.",
+    "Check the eligibility criteria for that specific programme.",
+    "Complete the entrance requirement: LPUNEST, or a qualifying national test where the programme accepts one.",
+    "Upload or submit the required documents.",
+    "Check your scholarship eligibility against the current official criteria.",
+    "Follow the university's instructions for fee payment. Pay only through the official portal.",
+    "Track your admission status on the portal and respond to any counselling communication."
+  ],
+  "scholarships": [
+    { "name": "Academic merit", "detail": "Based on Class 12 or qualifying examination marks, on a slab system. The slabs change by session." },
+    { "name": "LPUNEST based", "detail": "Based on your LPUNEST score, with higher scores attracting larger concessions." },
+    { "name": "National level examinations", "detail": "Consideration for students with strong JEE Main, NEET, CAT, MAT, CLAT or similar scores, where the programme accepts them." },
+    { "name": "Sports", "detail": "For students with a recognised record at state, national or international level. Trials or certificates are usually required." },
+    { "name": "Cultural", "detail": "For achievement in performing or creative arts, usually assessed through an audition or portfolio." },
+    { "name": "Financial assistance", "detail": "Support for specific categories and circumstances as defined in the current official policy, including defence personnel and sibling concessions where offered." }
+  ],
+  "hostel": [
+    "Separate hostels for men and women, with air-conditioned and non-air-conditioned room options.",
+    "Mess facilities with multiple menus, plus food courts and cafes across campus.",
+    "Wi-Fi, laundry, medical support and campus-wide security.",
+    "University transport connecting the campus to nearby towns.",
+    "Sports facilities including grounds, courts and a gym, with clubs and cultural societies."
+  ],
+  "faqs": [
+    { "q": "How do I apply?", "a": "Register on admission.lpu.in, complete the form, choose your programme, and follow the portal's instructions for documents and fees." },
+    { "q": "Is LPUNEST compulsory?", "a": "It depends on the programme. Many programmes accept LPUNEST or a national entrance score, and some allow direct admission subject to eligibility. Check the specific programme page." },
+    { "q": "Can I get admission without an entrance exam?", "a": "For several programmes, yes, subject to eligibility. Competitive programmes generally weigh an entrance score." },
+    { "q": "Do you offer lateral entry?", "a": "Lateral entry routes exist for some diploma and degree programmes. Confirm the current rules for your programme on the official portal." },
+    { "q": "How do I check my application status?", "a": "Only the official admission portal can show your status. This assistant cannot access or verify applications." }
+  ]
+}
