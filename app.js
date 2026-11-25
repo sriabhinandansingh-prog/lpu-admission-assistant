@@ -17,8 +17,16 @@ const formEl = document.getElementById('composer');
 
 /* ---------- settings ---------- */
 const SETTINGS_KEY = 'lpu-assistant-settings';
+/* Leave this empty to let each visitor paste their own backend URL in Settings.
+   Set it to your deployed backend (see DEPLOY.md) and every visitor uses it,
+   with no setup step at all. The model key stays on that server. */
+const DEFAULT_BACKEND = '';
+
 function loadSettings() {
-  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'); } catch { return {}; }
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'); } catch { s = {}; }
+  if (!s.backendUrl && DEFAULT_BACKEND) s.backendUrl = DEFAULT_BACKEND;
+  return s;
 }
 function saveSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
 

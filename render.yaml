@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: lpu-assistai-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: ALLOWED_ORIGIN
+        value: https://sriabhinandansingh-prog.github.io
+      - key: RATE_LIMIT
+        value: "30"
+      # Set these in the Render dashboard, not in git.
+      - key: MODEL_API_KEY
+        sync: false
+      - key: MODEL_ENDPOINT
+        sync: false
+      - key: MODEL_NAME
+        sync: false
+      - key: MODEL_DISPLAY_NAME
+        sync: false

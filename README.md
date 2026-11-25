@@ -8,6 +8,22 @@ LPU Admission AssistAI: an admission-counsellor chatbot for Lovely Professional 
 
 **Live site:** https://sriabhinandansingh-prog.github.io/lpu-admission-assistant/
 
+## Deploying
+
+`DEPLOY.md` covers the whole path: Render (one-click blueprint via `render.yaml`), Railway (`railway.json`) or Fly (`fly.toml`), each building the same `Dockerfile`. All three can run with no model key at all, in retrieval-only mode.
+
+```bash
+docker build -t lpu-assistant .
+docker run -p 8787:8787 --env-file .env lpu-assistant
+curl localhost:8787/api/health
+```
+
+Then paste the service URL into the live site's Settings, or set `DEFAULT_BACKEND` in `app.js` to make it the default for every visitor.
+
+## Fine-tuning
+
+`train/colab_finetune.ipynb` runs the whole thing on a free Colab T4: install, rebuild the dataset, train the LoRA adapter, and a set of refusal tests that must pass before you deploy it. The script itself is `train/train_lora.py`.
+
 ## The system prompt
 
 `prompts/system_prompt.txt` is the single source of truth for the assistant's instructions: identity, the four languages, the one-question-at-a-time conversation rule, the accuracy rules, response style and the official links. The backend and the dataset builder both load that file, so there is one prompt to edit, not three copies.
