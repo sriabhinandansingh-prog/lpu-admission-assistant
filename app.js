@@ -58,30 +58,42 @@ function detectIntent(text) {
 
 function findProgramme(text) {
   if (!KB) return null;
-  const t = text.toLowerCase().replace(/[^a-z0-9. ]/g, ' ');
+  const t = ' ' + text.toLowerCase().replace(/[^a-z0-9. ]/g, ' ').replace(/\s+/g, ' ') + ' ';
+  const squash = t.replace(/ /g, '');
   const alias = {
     btech: ['b.tech', 'btech', 'b tech', 'engineering'],
     bca: ['bca'],
     bba: ['bba'],
     bcom: ['b.com', 'bcom', 'b com'],
     bsc: ['b.sc', 'bsc', 'b sc'],
-    ba: ['ba ', ' ba', 'b.a'],
-    bdes: ['b.des', 'bdes', 'design'],
+    ba: ['b.a', 'ba'],
+    bdes: ['b.des', 'bdes'],
     bpharm: ['b.pharm', 'bpharm', 'pharmacy'],
     llb: ['llb', 'law'],
     mba: ['mba'],
     mca: ['mca'],
     mtech: ['m.tech', 'mtech'],
     msc: ['m.sc', 'msc'],
-    ma: ['ma ', ' ma', 'm.a'],
+    ma: ['m.a', 'ma'],
     phd: ['phd', 'doctorate'],
     diploma: ['diploma']
   };
+  /* Longest alias wins, so "mba" is not read as "ba" and "bba" not as "ba". */
+  let best = null;
+  let bestLen = 0;
   for (const p of KB.programmes) {
-    const keys = alias[p.id] || [p.name.toLowerCase()];
-    if (keys.some(k => t.includes(k))) return p;
+    const keys = (alias[p.id] || []).concat([p.name.toLowerCase()]);
+    for (const k of keys) {
+      const needle = k.replace(/ /g, '');
+      if (!needle) continue;
+      const hit = squash.includes(needle) || t.includes(' ' + k + ' ');
+      if (hit && needle.length > bestLen) {
+        best = p;
+        bestLen = needle.length;
+      }
+    }
   }
-  return null;
+  return best;
 }
 
 /* ---------- answer builders ---------- */
@@ -93,21 +105,21 @@ const T = {
     pa: "LPU Admission AssistAI ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ!\n\nਮੈਂ ਤੁਹਾਡਾ AI ਦਾਖਲਾ ਕਾਊਂਸਲਰ ਹਾਂ। ਮੈਂ ਕੋਰਸ ਲੱਭਣ, ਯੋਗਤਾ ਜਾਂਚਣ, ਫੀਸ ਸਮਝਣ, ਸਕਾਲਰਸ਼ਿਪ ਦੇਖਣ ਅਤੇ ਦਾਖਲਾ ਪ੍ਰਕਿਰਿਆ ਜਾਣਨ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ।\n\nਅੱਜ ਮੈਂ ਤੁਹਾਡੀ ਕੀ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?"
   },
   fees: {
-    en: "**Answer:** I do not have a verified fee figure to give you, so I will not guess one.\n\n**Important details:**\n- Fees depend on the programme, the specialisation and the academic session.\n- Tuition, hostel and other charges are billed separately.\n- Scholarship deductions are shown separately from the base fee.\n\n**Next step:** Open the admission portal, select your programme, and read the fee section for the current session. A counsellor can confirm the exact amount.\n\n**Official link:** " + LINKS.admissions,
+    en: "I do not have a verified fee figure to give you, so I will not guess one.\n\n- Fees depend on the programme, the specialisation and the academic session.\n- Tuition, hostel and other charges are billed separately.\n- Scholarship deductions are shown separately from the base fee.\n\nNext step: Open the admission portal, select your programme, and read the fee section for the current session. A counsellor can confirm the exact amount.\n\nOfficial link: " + LINKS.admissions,
     hi: "**उत्तर:** मेरे पास सत्यापित फीस नहीं है, इसलिए मैं अनुमान नहीं लगाऊँगा।\n\n**महत्वपूर्ण जानकारी:**\n- फीस प्रोग्राम, स्पेशलाइजेशन और सत्र पर निर्भर करती है।\n- ट्यूशन, हॉस्टल और अन्य शुल्क अलग-अलग होते हैं।\n- छात्रवृत्ति की छूट मूल फीस से अलग दिखाई जाती है।\n\n**अगला कदम:** आधिकारिक पोर्टल पर अपना प्रोग्राम चुनें और वर्तमान सत्र की फीस देखें।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "**Answer:** Mere paas verified fees nahi hai, isliye main andaaza nahi lagaunga.\n\n**Important details:**\n- Fees programme, specialisation aur session par depend karti hai.\n- Tuition, hostel aur baaki charges alag hote hain.\n- Scholarship ki chhoot base fee se alag dikhayi jaati hai.\n\n**Next step:** Admission portal par apna programme select karo aur current session ki fees dekho.\n\n**Official link:** " + LINKS.admissions,
+    hinglish: "Mere paas verified fees nahi hai, isliye main andaaza nahi lagaunga.\n\n- Fees programme, specialisation aur session par depend karti hai.\n- Tuition, hostel aur baaki charges alag hote hain.\n- Scholarship ki chhoot base fee se alag dikhayi jaati hai.\n\nNext step: Admission portal par apna programme select karo aur current session ki fees dekho.\n\nOfficial link: " + LINKS.admissions,
     pa: "**ਜਵਾਬ:** ਮੇਰੇ ਕੋਲ ਪੱਕੀ ਫੀਸ ਨਹੀਂ ਹੈ, ਇਸ ਲਈ ਮੈਂ ਅੰਦਾਜ਼ਾ ਨਹੀਂ ਲਾਵਾਂਗਾ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- ਫੀਸ ਪ੍ਰੋਗਰਾਮ, ਸਪੈਸ਼ਲਾਈਜ਼ੇਸ਼ਨ ਅਤੇ ਸੈਸ਼ਨ 'ਤੇ ਨਿਰਭਰ ਕਰਦੀ ਹੈ।\n- ਟਿਊਸ਼ਨ, ਹੋਸਟਲ ਅਤੇ ਹੋਰ ਖਰਚੇ ਵੱਖਰੇ ਹੁੰਦੇ ਹਨ।\n\n**ਅਗਲਾ ਕਦਮ:** ਅਧਿਕਾਰਤ ਪੋਰਟਲ 'ਤੇ ਆਪਣਾ ਪ੍ਰੋਗਰਾਮ ਚੁਣੋ ਅਤੇ ਮੌਜੂਦਾ ਸੈਸ਼ਨ ਦੀ ਫੀਸ ਦੇਖੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
   },
   status: {
-    en: "**Answer:** I cannot check your application status.\n\n**Important details:**\n- This assistant has no access to the university's admission database.\n- Only the official portal can confirm an application, a document check or a payment.\n\n**Next step:** Log in to the admission portal with the credentials you registered with.\n\n**Official link:** " + LINKS.admissions,
+    en: "I cannot check your application status.\n\n- This assistant has no access to the university's admission database.\n- Only the official portal can confirm an application, a document check or a payment.\n\nNext step: Log in to the admission portal with the credentials you registered with.\n\nOfficial link: " + LINKS.admissions,
     hi: "**उत्तर:** मैं आपकी आवेदन स्थिति नहीं देख सकता।\n\n**महत्वपूर्ण जानकारी:**\n- इस सहायक की विश्वविद्यालय के डेटाबेस तक पहुँच नहीं है।\n- केवल आधिकारिक पोर्टल ही आवेदन या भुगतान की पुष्टि कर सकता है।\n\n**अगला कदम:** उसी लॉगिन से आधिकारिक पोर्टल पर जाएँ।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "**Answer:** Main aapka application status nahi dekh sakta.\n\n**Important details:**\n- Is assistant ko university ke database ka access nahi hai.\n- Sirf official portal hi application ya payment confirm kar sakta hai.\n\n**Next step:** Official portal par apne login se check karo.\n\n**Official link:** " + LINKS.admissions,
+    hinglish: "Main aapka application status nahi dekh sakta.\n\n- Is assistant ko university ke database ka access nahi hai.\n- Sirf official portal hi application ya payment confirm kar sakta hai.\n\nNext step: Official portal par apne login se check karo.\n\nOfficial link: " + LINKS.admissions,
     pa: "**ਜਵਾਬ:** ਮੈਂ ਤੁਹਾਡੀ ਅਰਜ਼ੀ ਦੀ ਸਥਿਤੀ ਨਹੀਂ ਦੇਖ ਸਕਦਾ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- ਇਸ ਸਹਾਇਕ ਕੋਲ ਯੂਨੀਵਰਸਿਟੀ ਡੇਟਾਬੇਸ ਦੀ ਪਹੁੰਚ ਨਹੀਂ ਹੈ।\n- ਸਿਰਫ਼ ਅਧਿਕਾਰਤ ਪੋਰਟਲ ਹੀ ਪੁਸ਼ਟੀ ਕਰ ਸਕਦਾ ਹੈ।\n\n**ਅਗਲਾ ਕਦਮ:** ਅਧਿਕਾਰਤ ਪੋਰਟਲ 'ਤੇ ਲੌਗਇਨ ਕਰੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
   },
   fallback: {
-    en: "**Answer:** I don't have a verified answer for that.\n\n**Important details:**\n- I answer from a small, fixed knowledge base: courses, eligibility, fees policy, scholarships, admission steps, LPUNEST, hostel and campus.\n- I would rather say so than invent a detail.\n\n**Next step:** Try asking about a course or the admission process, or check the official portal.\n\n**Official link:** " + LINKS.admissions,
+    en: "I don't have a verified answer for that.\n\n- I answer from a small, fixed knowledge base: courses, eligibility, fees policy, scholarships, admission steps, LPUNEST, hostel and campus.\n- I would rather say so than invent a detail.\n\nNext step: Try asking about a course or the admission process, or check the official portal.\n\nOfficial link: " + LINKS.admissions,
     hi: "**उत्तर:** इसका सत्यापित उत्तर मेरे पास नहीं है।\n\n**महत्वपूर्ण जानकारी:**\n- मैं सीमित जानकारी से उत्तर देता हूँ: कोर्स, पात्रता, फीस नीति, छात्रवृत्ति, दाखिला, LPUNEST, हॉस्टल।\n- गलत जानकारी देने से बेहतर है साफ़ कहना।\n\n**अगला कदम:** किसी कोर्स या दाखिला प्रक्रिया के बारे में पूछें।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "**Answer:** Iska verified answer mere paas nahi hai.\n\n**Important details:**\n- Main limited knowledge base se answer deta hoon: course, eligibility, fees policy, scholarship, admission steps, LPUNEST, hostel.\n- Galat detail dene se behtar hai saaf kehna.\n\n**Next step:** Kisi course ya admission process ke baare me poochho.\n\n**Official link:** " + LINKS.admissions,
+    hinglish: "Iska verified answer mere paas nahi hai.\n\n- Main limited knowledge base se answer deta hoon: course, eligibility, fees policy, scholarship, admission steps, LPUNEST, hostel.\n- Galat detail dene se behtar hai saaf kehna.\n\nNext step: Kisi course ya admission process ke baare me poochho.\n\nOfficial link: " + LINKS.admissions,
     pa: "**ਜਵਾਬ:** ਇਸਦਾ ਪੱਕਾ ਜਵਾਬ ਮੇਰੇ ਕੋਲ ਨਹੀਂ ਹੈ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- ਮੈਂ ਸੀਮਿਤ ਜਾਣਕਾਰੀ ਤੋਂ ਜਵਾਬ ਦਿੰਦਾ ਹਾਂ: ਕੋਰਸ, ਯੋਗਤਾ, ਫੀਸ ਨੀਤੀ, ਸਕਾਲਰਸ਼ਿਪ, ਦਾਖਲਾ, LPUNEST, ਹੋਸਟਲ।\n\n**ਅਗਲਾ ਕਦਮ:** ਕਿਸੇ ਕੋਰਸ ਜਾਂ ਦਾਖਲਾ ਪ੍ਰਕਿਰਿਆ ਬਾਰੇ ਪੁੱਛੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
   }
 };
@@ -115,15 +127,15 @@ const T = {
 function programmeList(lang) {
   const rows = KB.programmes.map(p => `- **${p.name}** · ${p.level} · ${p.duration}`).join('\n');
   const head = {
-    en: "**Answer:** These are the programme families the assistant knows about.\n\n**Important details:**",
+    en: "These are the programme families the assistant knows about.\n\n",
     hi: "**उत्तर:** ये प्रमुख प्रोग्राम हैं जिनकी जानकारी मेरे पास है।\n\n**महत्वपूर्ण जानकारी:**",
-    hinglish: "**Answer:** Ye main programme families hain jinki jankari mere paas hai.\n\n**Important details:**",
+    hinglish: "Ye main programme families hain jinki jankari mere paas hai.\n\n",
     pa: "**ਜਵਾਬ:** ਇਹ ਮੁੱਖ ਪ੍ਰੋਗਰਾਮ ਹਨ ਜਿਨ੍ਹਾਂ ਦੀ ਜਾਣਕਾਰੀ ਮੇਰੇ ਕੋਲ ਹੈ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**"
   }[lang];
   const tail = {
-    en: "\n\n**Next step:** Name the programme you are interested in and I will share its duration, eligibility and entrance requirement.\n\n**Official link:** " + LINKS.university,
+    en: "\n\nNext step: Name the programme you are interested in and I will share its duration, eligibility and entrance requirement.\n\nOfficial link: " + LINKS.university,
     hi: "\n\n**अगला कदम:** जिस प्रोग्राम में रुचि है उसका नाम बताएँ, मैं उसकी अवधि, पात्रता और प्रवेश परीक्षा बताऊँगा।\n\n**आधिकारिक लिंक:** " + LINKS.university,
-    hinglish: "\n\n**Next step:** Jis programme me interest hai uska naam batao, main duration, eligibility aur entrance bataunga.\n\n**Official link:** " + LINKS.university,
+    hinglish: "\n\nNext step: Jis programme me interest hai uska naam batao, main duration, eligibility aur entrance bataunga.\n\nOfficial link: " + LINKS.university,
     pa: "\n\n**ਅਗਲਾ ਕਦਮ:** ਜਿਸ ਪ੍ਰੋਗਰਾਮ ਵਿੱਚ ਦਿਲਚਸਪੀ ਹੈ ਉਸਦਾ ਨਾਮ ਦੱਸੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.university
   }[lang];
   return head + '\n' + rows + tail;
@@ -132,18 +144,18 @@ function programmeList(lang) {
 function eligibilityAnswer(p, lang) {
   if (!p) {
     const ask = {
-      en: "**Answer:** I can check eligibility, but I need to know the programme first.\n\n**Important details:**\n- Tell me the course (for example B.Tech, BCA, MBA) and your Class 12 percentage and stream.\n- Eligibility is set per programme, so a general answer would be misleading.\n\n**Next step:** Reply with your programme and marks.\n\n**Official link:** " + LINKS.admissions,
+      en: "I can check eligibility, but I need to know the programme first.\n\n- Tell me the course (for example B.Tech, BCA, MBA) and your Class 12 percentage and stream.\n- Eligibility is set per programme, so a general answer would be misleading.\n\nNext step: Reply with your programme and marks.\n\nOfficial link: " + LINKS.admissions,
       hi: "**उत्तर:** मैं पात्रता जाँच सकता हूँ, लेकिन पहले प्रोग्राम बताइए।\n\n**महत्वपूर्ण जानकारी:**\n- कोर्स (जैसे B.Tech, BCA, MBA) और 12वीं का प्रतिशत व स्ट्रीम बताएँ।\n- पात्रता हर प्रोग्राम के लिए अलग होती है।\n\n**अगला कदम:** प्रोग्राम और अंक बताएँ।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-      hinglish: "**Answer:** Main eligibility check kar sakta hoon, par pehle programme batao.\n\n**Important details:**\n- Course (jaise B.Tech, BCA, MBA) aur Class 12 percentage aur stream batao.\n- Eligibility har programme ke liye alag hoti hai.\n\n**Next step:** Programme aur marks bhejo.\n\n**Official link:** " + LINKS.admissions,
+      hinglish: "Main eligibility check kar sakta hoon, par pehle programme batao.\n\n- Course (jaise B.Tech, BCA, MBA) aur Class 12 percentage aur stream batao.\n- Eligibility har programme ke liye alag hoti hai.\n\nNext step: Programme aur marks bhejo.\n\nOfficial link: " + LINKS.admissions,
       pa: "**ਜਵਾਬ:** ਮੈਂ ਯੋਗਤਾ ਜਾਂਚ ਸਕਦਾ ਹਾਂ, ਪਰ ਪਹਿਲਾਂ ਪ੍ਰੋਗਰਾਮ ਦੱਸੋ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- ਕੋਰਸ (ਜਿਵੇਂ B.Tech, BCA, MBA) ਅਤੇ 12ਵੀਂ ਦੇ ਅੰਕ ਤੇ ਸਟ੍ਰੀਮ ਦੱਸੋ।\n\n**ਅਗਲਾ ਕਦਮ:** ਪ੍ਰੋਗਰਾਮ ਅਤੇ ਅੰਕ ਭੇਜੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
     }[lang];
     return ask;
   }
   const subjectLine = p.subjects.join(', ');
   const verdicts = {
-    en: "**Verdict:** Needs official verification. I can tell you the stated criteria, but I cannot confirm your admission.\n\n**Important details:**\n- **Programme:** " + p.name + " (" + p.duration + ")\n- **Stated requirement:** " + p.eligibility + "\n- **Relevant subjects:** " + subjectLine + "\n- **Entrance:** " + p.entrance + "\n- The final decision is the university's, based on your documents.\n\n**Next step:** Compare your marks against the requirement above, then confirm on the programme page or with a counsellor.\n\n**Official link:** " + LINKS.university,
+    en: "Note: Needs official verification. I can tell you the stated criteria, but I cannot confirm your admission.\n\n- **Programme:** " + p.name + " (" + p.duration + ")\n- **Stated requirement:** " + p.eligibility + "\n- **Relevant subjects:** " + subjectLine + "\n- **Entrance:** " + p.entrance + "\n- The final decision is the university's, based on your documents.\n\nNext step: Compare your marks against the requirement above, then confirm on the programme page or with a counsellor.\n\nOfficial link: " + LINKS.university,
     hi: "**निर्णय:** आधिकारिक सत्यापन आवश्यक है। मैं नियम बता सकता हूँ, दाखिले की पुष्टि नहीं कर सकता।\n\n**महत्वपूर्ण जानकारी:**\n- **प्रोग्राम:** " + p.name + " (" + p.duration + ")\n- **आवश्यकता:** " + p.eligibility + "\n- **विषय:** " + subjectLine + "\n- **प्रवेश परीक्षा:** " + p.entrance + "\n- अंतिम निर्णय विश्वविद्यालय का होगा।\n\n**अगला कदम:** अपने अंक ऊपर दी गई आवश्यकता से मिलाएँ और पुष्टि करें।\n\n**आधिकारिक लिंक:** " + LINKS.university,
-    hinglish: "**Verdict:** Official verification chahiye. Main criteria bata sakta hoon, admission confirm nahi kar sakta.\n\n**Important details:**\n- **Programme:** " + p.name + " (" + p.duration + ")\n- **Requirement:** " + p.eligibility + "\n- **Subjects:** " + subjectLine + "\n- **Entrance:** " + p.entrance + "\n- Final decision university ka hoga.\n\n**Next step:** Apne marks upar diye requirement se match karo, phir confirm karo.\n\n**Official link:** " + LINKS.university,
+    hinglish: "Note: Official verification chahiye. Main criteria bata sakta hoon, admission confirm nahi kar sakta.\n\n- **Programme:** " + p.name + " (" + p.duration + ")\n- **Requirement:** " + p.eligibility + "\n- **Subjects:** " + subjectLine + "\n- **Entrance:** " + p.entrance + "\n- Final decision university ka hoga.\n\nNext step: Apne marks upar diye requirement se match karo, phir confirm karo.\n\nOfficial link: " + LINKS.university,
     pa: "**ਨਤੀਜਾ:** ਅਧਿਕਾਰਤ ਪੁਸ਼ਟੀ ਲੋੜੀਂਦੀ ਹੈ। ਮੈਂ ਨਿਯਮ ਦੱਸ ਸਕਦਾ ਹਾਂ, ਦਾਖਲਾ ਪੱਕਾ ਨਹੀਂ ਕਰ ਸਕਦਾ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- **ਪ੍ਰੋਗਰਾਮ:** " + p.name + " (" + p.duration + ")\n- **ਲੋੜ:** " + p.eligibility + "\n- **ਵਿਸ਼ੇ:** " + subjectLine + "\n- **ਪ੍ਰਵੇਸ਼ ਪ੍ਰੀਖਿਆ:** " + p.entrance + "\n\n**ਅਗਲਾ ਕਦਮ:** ਆਪਣੇ ਅੰਕ ਉੱਪਰ ਦਿੱਤੀ ਲੋੜ ਨਾਲ ਮਿਲਾਓ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.university
   };
   return verdicts[lang];
@@ -152,15 +164,15 @@ function eligibilityAnswer(p, lang) {
 function admissionAnswer(lang) {
   const steps = KB.admission_steps.map((s, i) => `${i + 1}. ${s}`).join('\n');
   const head = {
-    en: "**Answer:** Here is the admission process, step by step.\n\n**Important details:**",
+    en: "Here is the admission process, step by step.\n\n",
     hi: "**उत्तर:** दाखिला प्रक्रिया इस प्रकार है।\n\n**महत्वपूर्ण जानकारी:**",
-    hinglish: "**Answer:** Admission process step by step ye hai.\n\n**Important details:**",
+    hinglish: "Admission process step by step ye hai.\n\n",
     pa: "**ਜਵਾਬ:** ਦਾਖਲਾ ਪ੍ਰਕਿਰਿਆ ਇਹ ਹੈ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**"
   }[lang];
   const tail = {
-    en: "\n\n**Next step:** Start with step 1. Pay only through the official portal, never through a third party.\n\n**Official link:** " + LINKS.admissions,
+    en: "\n\nNext step: Start with step 1. Pay only through the official portal, never through a third party.\n\nOfficial link: " + LINKS.admissions,
     hi: "\n\n**अगला कदम:** चरण 1 से शुरू करें। भुगतान केवल आधिकारिक पोर्टल से करें।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "\n\n**Next step:** Step 1 se shuru karo. Payment sirf official portal se karo.\n\n**Official link:** " + LINKS.admissions,
+    hinglish: "\n\nNext step: Step 1 se shuru karo. Payment sirf official portal se karo.\n\nOfficial link: " + LINKS.admissions,
     pa: "\n\n**ਅਗਲਾ ਕਦਮ:** ਕਦਮ 1 ਤੋਂ ਸ਼ੁਰੂ ਕਰੋ। ਭੁਗਤਾਨ ਸਿਰਫ਼ ਅਧਿਕਾਰਤ ਪੋਰਟਲ ਤੋਂ ਕਰੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
   }[lang];
   return head + '\n' + steps + tail;
@@ -169,15 +181,15 @@ function admissionAnswer(lang) {
 function scholarshipAnswer(lang) {
   const rows = KB.scholarships.map(s => `- **${s.name}:** ${s.detail}`).join('\n');
   const head = {
-    en: "**Answer:** LPU offers several scholarship categories. I can explain them, but I will not quote an amount.\n\n**Important details:**",
+    en: "LPU offers several scholarship categories. I can explain them, but I will not quote an amount.\n\n",
     hi: "**उत्तर:** LPU में कई छात्रवृत्ति श्रेणियाँ हैं। मैं जानकारी दे सकता हूँ, राशि नहीं बता सकता।\n\n**महत्वपूर्ण जानकारी:**",
-    hinglish: "**Answer:** LPU me kai scholarship categories hain. Main explain kar sakta hoon, amount nahi bata sakta.\n\n**Important details:**",
+    hinglish: "LPU me kai scholarship categories hain. Main explain kar sakta hoon, amount nahi bata sakta.\n\n",
     pa: "**ਜਵਾਬ:** LPU ਵਿੱਚ ਕਈ ਸਕਾਲਰਸ਼ਿਪ ਸ਼੍ਰੇਣੀਆਂ ਹਨ। ਮੈਂ ਜਾਣਕਾਰੀ ਦੇ ਸਕਦਾ ਹਾਂ, ਰਕਮ ਨਹੀਂ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**"
   }[lang];
   const tail = {
-    en: "\n\n**Next step:** Share your Class 12 percentage and any entrance score, and check the current slabs on the portal. Slabs change every session.\n\n**Official link:** " + LINKS.admissions,
+    en: "\n\nNext step: Share your Class 12 percentage and any entrance score, and check the current slabs on the portal. Slabs change every session.\n\nOfficial link: " + LINKS.admissions,
     hi: "\n\n**अगला कदम:** 12वीं का प्रतिशत और प्रवेश परीक्षा स्कोर बताएँ, और पोर्टल पर वर्तमान स्लैब देखें।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "\n\n**Next step:** Class 12 percentage aur entrance score batao, aur portal par current slabs dekho. Slabs har session badalte hain.\n\n**Official link:** " + LINKS.admissions,
+    hinglish: "\n\nNext step: Class 12 percentage aur entrance score batao, aur portal par current slabs dekho. Slabs har session badalte hain.\n\nOfficial link: " + LINKS.admissions,
     pa: "\n\n**ਅਗਲਾ ਕਦਮ:** 12ਵੀਂ ਦੇ ਅੰਕ ਅਤੇ ਪ੍ਰੀਖਿਆ ਸਕੋਰ ਦੱਸੋ, ਪੋਰਟਲ 'ਤੇ ਮੌਜੂਦਾ ਸਲੈਬ ਦੇਖੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
   }[lang];
   return head + '\n' + rows + tail;
@@ -186,15 +198,15 @@ function scholarshipAnswer(lang) {
 function hostelAnswer(lang) {
   const rows = KB.hostel.map(h => `- ${h}`).join('\n');
   const head = {
-    en: "**Answer:** LPU runs its own residential campus.\n\n**Important details:**",
+    en: "LPU runs its own residential campus.\n\n",
     hi: "**उत्तर:** LPU का अपना आवासीय कैंपस है।\n\n**महत्वपूर्ण जानकारी:**",
-    hinglish: "**Answer:** LPU ka apna residential campus hai.\n\n**Important details:**",
+    hinglish: "LPU ka apna residential campus hai.\n\n",
     pa: "**ਜਵਾਬ:** LPU ਦਾ ਆਪਣਾ ਰਿਹਾਇਸ਼ੀ ਕੈਂਪਸ ਹੈ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**"
   }[lang];
   const tail = {
-    en: "\n\n**Next step:** Hostel type and charges depend on the room category and session. Confirm the current rates on the portal.\n\n**Official link:** " + LINKS.university,
+    en: "\n\nNext step: Hostel type and charges depend on the room category and session. Confirm the current rates on the portal.\n\nOfficial link: " + LINKS.university,
     hi: "\n\n**अगला कदम:** हॉस्टल प्रकार और शुल्क कमरे की श्रेणी पर निर्भर हैं। पोर्टल पर पुष्टि करें।\n\n**आधिकारिक लिंक:** " + LINKS.university,
-    hinglish: "\n\n**Next step:** Hostel type aur charges room category par depend karte hain. Portal par confirm karo.\n\n**Official link:** " + LINKS.university,
+    hinglish: "\n\nNext step: Hostel type aur charges room category par depend karte hain. Portal par confirm karo.\n\nOfficial link: " + LINKS.university,
     pa: "\n\n**ਅਗਲਾ ਕਦਮ:** ਹੋਸਟਲ ਦੀ ਕਿਸਮ ਅਤੇ ਖਰਚੇ ਕਮਰੇ ਦੀ ਸ਼੍ਰੇਣੀ 'ਤੇ ਨਿਰਭਰ ਹਨ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.university
   }[lang];
   return head + '\n' + rows + tail;
@@ -203,15 +215,15 @@ function hostelAnswer(lang) {
 function entranceAnswer(lang) {
   const rows = KB.programmes.map(p => `- **${p.name}:** ${p.entrance}`).join('\n');
   const head = {
-    en: "**Answer:** LPUNEST is LPU's own entrance test, and many programmes accept a national score instead.\n\n**Important details:**",
+    en: "LPUNEST is LPU's own entrance test, and many programmes accept a national score instead.\n\n",
     hi: "**उत्तर:** LPUNEST LPU की प्रवेश परीक्षा है, और कई प्रोग्राम राष्ट्रीय स्कोर भी स्वीकार करते हैं।\n\n**महत्वपूर्ण जानकारी:**",
-    hinglish: "**Answer:** LPUNEST LPU ka apna entrance test hai, aur kai programmes national score bhi accept karte hain.\n\n**Important details:**",
+    hinglish: "LPUNEST LPU ka apna entrance test hai, aur kai programmes national score bhi accept karte hain.\n\n",
     pa: "**ਜਵਾਬ:** LPUNEST LPU ਦੀ ਆਪਣੀ ਪ੍ਰਵੇਸ਼ ਪ੍ਰੀਖਿਆ ਹੈ, ਕਈ ਪ੍ਰੋਗਰਾਮ ਰਾਸ਼ਟਰੀ ਸਕੋਰ ਵੀ ਮੰਨਦੇ ਹਨ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**"
   }[lang];
   const tail = {
-    en: "\n\n**Next step:** Check the entrance requirement for your exact programme, plus the current test dates and pattern, on the admission portal.\n\n**Official link:** " + LINKS.admissions,
+    en: "\n\nNext step: Check the entrance requirement for your exact programme, plus the current test dates and pattern, on the admission portal.\n\nOfficial link: " + LINKS.admissions,
     hi: "\n\n**अगला कदम:** अपने प्रोग्राम की प्रवेश परीक्षा आवश्यकता और तिथियाँ पोर्टल पर देखें।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "\n\n**Next step:** Apne programme ka entrance requirement aur test dates portal par dekho.\n\n**Official link:** " + LINKS.admissions,
+    hinglish: "\n\nNext step: Apne programme ka entrance requirement aur test dates portal par dekho.\n\nOfficial link: " + LINKS.admissions,
     pa: "\n\n**ਅਗਲਾ ਕਦਮ:** ਆਪਣੇ ਪ੍ਰੋਗਰਾਮ ਦੀ ਪ੍ਰੀਖਿਆ ਲੋੜ ਅਤੇ ਤਾਰੀਖਾਂ ਪੋਰਟਲ 'ਤੇ ਦੇਖੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
   }[lang];
   return head + '\n' + rows + tail;
@@ -220,15 +232,15 @@ function entranceAnswer(lang) {
 function campusAnswer(lang) {
   const rows = KB.university.schools.map(s => `- ${s}`).join('\n');
   const head = {
-    en: "**Answer:** " + KB.university.name + " was established in " + KB.university.established + " at " + KB.university.location + ". " + KB.university.campus + "\n\n**Schools and disciplines:**",
+    en: "" + KB.university.name + " was established in " + KB.university.established + " at " + KB.university.location + ". " + KB.university.campus + "\n\n**Schools and disciplines:**",
     hi: "**उत्तर:** " + KB.university.name + " की स्थापना " + KB.university.established + " में " + KB.university.location + " में हुई। " + KB.university.campus + "\n\n**स्कूल और विषय:**",
-    hinglish: "**Answer:** " + KB.university.name + " " + KB.university.established + " me " + KB.university.location + " me establish hua. " + KB.university.campus + "\n\n**Schools and disciplines:**",
+    hinglish: "" + KB.university.name + " " + KB.university.established + " me " + KB.university.location + " me establish hua. " + KB.university.campus + "\n\n**Schools and disciplines:**",
     pa: "**ਜਵਾਬ:** " + KB.university.name + " " + KB.university.established + " ਵਿੱਚ " + KB.university.location + " ਵਿੱਚ ਸਥਾਪਿਤ ਹੋਇਆ। " + KB.university.campus + "\n\n**ਸਕੂਲ ਅਤੇ ਵਿਸ਼ੇ:**"
   }[lang];
   const tail = {
-    en: "\n\n**Next step:** Campus visits and open days are announced on the university site.\n\n**Official link:** " + LINKS.university,
+    en: "\n\nNext step: Campus visits and open days are announced on the university site.\n\nOfficial link: " + LINKS.university,
     hi: "\n\n**अगला कदम:** कैंपस विज़िट की जानकारी विश्वविद्यालय की साइट पर मिलती है।\n\n**आधिकारिक लिंक:** " + LINKS.university,
-    hinglish: "\n\n**Next step:** Campus visit ki jankari university site par milti hai.\n\n**Official link:** " + LINKS.university,
+    hinglish: "\n\nNext step: Campus visit ki jankari university site par milti hai.\n\nOfficial link: " + LINKS.university,
     pa: "\n\n**ਅਗਲਾ ਕਦਮ:** ਕੈਂਪਸ ਵਿਜ਼ਿਟ ਦੀ ਜਾਣਕਾਰੀ ਯੂਨੀਵਰਸਿਟੀ ਸਾਈਟ 'ਤੇ ਮਿਲਦੀ ਹੈ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.university
   }[lang];
   return head + '\n' + rows + tail;
@@ -236,9 +248,9 @@ function campusAnswer(lang) {
 
 function placementAnswer(lang) {
   const map = {
-    en: "**Answer:** LPU runs a central placement cell and publishes placement reports, but I will not quote a package or a placement rate.\n\n**Important details:**\n- Outcomes differ sharply by programme, specialisation and year.\n- Ask for the report for your specific programme rather than a campus-wide average.\n- No university can guarantee a placement.\n\n**Next step:** Request the latest placement report for your programme from a counsellor.\n\n**Official link:** " + LINKS.university,
+    en: "LPU runs a central placement cell and publishes placement reports, but I will not quote a package or a placement rate.\n\n- Outcomes differ sharply by programme, specialisation and year.\n- Ask for the report for your specific programme rather than a campus-wide average.\n- No university can guarantee a placement.\n\nNext step: Request the latest placement report for your programme from a counsellor.\n\nOfficial link: " + LINKS.university,
     hi: "**उत्तर:** LPU का प्लेसमेंट सेल है और रिपोर्ट प्रकाशित होती हैं, पर मैं पैकेज या प्रतिशत नहीं बताऊँगा।\n\n**महत्वपूर्ण जानकारी:**\n- परिणाम प्रोग्राम और वर्ष के अनुसार बदलते हैं।\n- कैंपस-व्यापी औसत के बजाय अपने प्रोग्राम की रिपोर्ट माँगें।\n- कोई भी विश्वविद्यालय प्लेसमेंट की गारंटी नहीं दे सकता।\n\n**अगला कदम:** अपने प्रोग्राम की नवीनतम रिपोर्ट माँगें।\n\n**आधिकारिक लिंक:** " + LINKS.university,
-    hinglish: "**Answer:** LPU ka placement cell hai aur reports publish hoti hain, par main package ya percentage nahi bataunga.\n\n**Important details:**\n- Results programme aur year ke hisaab se badalte hain.\n- Campus-wide average ke bajaye apne programme ki report maango.\n- Koi university placement guarantee nahi de sakti.\n\n**Next step:** Apne programme ki latest report maango.\n\n**Official link:** " + LINKS.university,
+    hinglish: "LPU ka placement cell hai aur reports publish hoti hain, par main package ya percentage nahi bataunga.\n\n- Results programme aur year ke hisaab se badalte hain.\n- Campus-wide average ke bajaye apne programme ki report maango.\n- Koi university placement guarantee nahi de sakti.\n\nNext step: Apne programme ki latest report maango.\n\nOfficial link: " + LINKS.university,
     pa: "**ਜਵਾਬ:** LPU ਦਾ ਪਲੇਸਮੈਂਟ ਸੈੱਲ ਹੈ ਅਤੇ ਰਿਪੋਰਟਾਂ ਪ੍ਰਕਾਸ਼ਿਤ ਹੁੰਦੀਆਂ ਹਨ, ਪਰ ਮੈਂ ਪੈਕੇਜ ਨਹੀਂ ਦੱਸਾਂਗਾ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- ਨਤੀਜੇ ਪ੍ਰੋਗਰਾਮ ਅਤੇ ਸਾਲ ਅਨੁਸਾਰ ਵੱਖਰੇ ਹੁੰਦੇ ਹਨ।\n- ਕੈਂਪਸ-ਵਿਆਪੀ ਔਸਤ ਦੀ ਥਾਂ ਆਪਣੇ ਪ੍ਰੋਗਰਾਮ ਦੀ ਰਿਪੋਰਟ ਮੰਗੋ।\n- ਕੋਈ ਯੂਨੀਵਰਸਿਟੀ ਪਲੇਸਮੈਂਟ ਦੀ ਗਾਰੰਟੀ ਨਹੀਂ ਦੇ ਸਕਦੀ।\n\n**ਅਗਲਾ ਕਦਮ:** ਆਪਣੇ ਪ੍ਰੋਗਰਾਮ ਦੀ ਨਵੀਨਤਮ ਰਿਪੋਰਟ ਮੰਗੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.university
   };
   return map[lang];
@@ -246,9 +258,9 @@ function placementAnswer(lang) {
 
 function contactAnswer(lang) {
   const map = {
-    en: "**Answer:** Use the official channels rather than any number you find elsewhere.\n\n**Important details:**\n- Admission portal: " + LINKS.admissions + "\n- University site: " + LINKS.university + "\n- The university is at Phagwara, Punjab, on the Jalandhar-Delhi GT Road.\n\n**Next step:** Raise your query through the portal's contact form so it is logged.\n\n**Official link:** " + LINKS.admissions,
+    en: "Use the official channels rather than any number you find elsewhere.\n\n- Admission portal: " + LINKS.admissions + "\n- University site: " + LINKS.university + "\n- The university is at Phagwara, Punjab, on the Jalandhar-Delhi GT Road.\n\nNext step: Raise your query through the portal's contact form so it is logged.\n\nOfficial link: " + LINKS.admissions,
     hi: "**उत्तर:** केवल आधिकारिक माध्यमों का उपयोग करें।\n\n**महत्वपूर्ण जानकारी:**\n- प्रवेश पोर्टल: " + LINKS.admissions + "\n- विश्वविद्यालय साइट: " + LINKS.university + "\n- पता: फगवाड़ा, पंजाब\n\n**अगला कदम:** पोर्टल के संपर्क फ़ॉर्म से अपनी बात भेजें।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "**Answer:** Sirf official channels use karo.\n\n**Important details:**\n- Admission portal: " + LINKS.admissions + "\n- University site: " + LINKS.university + "\n- Address: Phagwara, Punjab\n\n**Next step:** Portal ke contact form se apni query bhejo.\n\n**Official link:** " + LINKS.admissions,
+    hinglish: "Sirf official channels use karo.\n\n- Admission portal: " + LINKS.admissions + "\n- University site: " + LINKS.university + "\n- Address: Phagwara, Punjab\n\nNext step: Portal ke contact form se apni query bhejo.\n\nOfficial link: " + LINKS.admissions,
     pa: "**ਜਵਾਬ:** ਸਿਰਫ਼ ਅਧਿਕਾਰਤ ਮਾਧਿਅਮ ਵਰਤੋ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- ਦਾਖਲਾ ਪੋਰਟਲ: " + LINKS.admissions + "\n- ਯੂਨੀਵਰਸਿਟੀ ਸਾਈਟ: " + LINKS.university + "\n- ਪਤਾ: ਫਗਵਾੜਾ, ਪੰਜਾਬ\n\n**ਅਗਲਾ ਕਦਮ:** ਪੋਰਟਲ ਦੇ ਸੰਪਰਕ ਫਾਰਮ ਰਾਹੀਂ ਭੇਜੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
   };
   return map[lang];
@@ -256,9 +268,9 @@ function contactAnswer(lang) {
 
 function programmeDetail(p, lang) {
   const map = {
-    en: "**Answer:** Here is what I have for " + p.name + ".\n\n**Important details:**\n- **Level:** " + p.level + "\n- **Duration:** " + p.duration + "\n- **School:** " + p.school + "\n- **Eligibility:** " + p.eligibility + "\n- **Relevant subjects:** " + p.subjects.join(', ') + "\n- **Entrance:** " + p.entrance + "\n\n**Next step:** Confirm the current fee and dates for this programme on the portal.\n\n**Official link:** " + LINKS.university,
+    en: "Here is what I have for " + p.name + ".\n\n- **Level:** " + p.level + "\n- **Duration:** " + p.duration + "\n- **School:** " + p.school + "\n- **Eligibility:** " + p.eligibility + "\n- **Relevant subjects:** " + p.subjects.join(', ') + "\n- **Entrance:** " + p.entrance + "\n\nNext step: Confirm the current fee and dates for this programme on the portal.\n\nOfficial link: " + LINKS.university,
     hi: "**उत्तर:** " + p.name + " की जानकारी।\n\n**महत्वपूर्ण जानकारी:**\n- **स्तर:** " + p.level + "\n- **अवधि:** " + p.duration + "\n- **स्कूल:** " + p.school + "\n- **पात्रता:** " + p.eligibility + "\n- **विषय:** " + p.subjects.join(', ') + "\n- **प्रवेश परीक्षा:** " + p.entrance + "\n\n**अगला कदम:** वर्तमान फीस और तिथियाँ पोर्टल पर पुष्टि करें।\n\n**आधिकारिक लिंक:** " + LINKS.university,
-    hinglish: "**Answer:** " + p.name + " ki jankari.\n\n**Important details:**\n- **Level:** " + p.level + "\n- **Duration:** " + p.duration + "\n- **School:** " + p.school + "\n- **Eligibility:** " + p.eligibility + "\n- **Subjects:** " + p.subjects.join(', ') + "\n- **Entrance:** " + p.entrance + "\n\n**Next step:** Current fee aur dates portal par confirm karo.\n\n**Official link:** " + LINKS.university,
+    hinglish: "" + p.name + " ki jankari.\n\n- **Level:** " + p.level + "\n- **Duration:** " + p.duration + "\n- **School:** " + p.school + "\n- **Eligibility:** " + p.eligibility + "\n- **Subjects:** " + p.subjects.join(', ') + "\n- **Entrance:** " + p.entrance + "\n\nNext step: Current fee aur dates portal par confirm karo.\n\nOfficial link: " + LINKS.university,
     pa: "**ਜਵਾਬ:** " + p.name + " ਦੀ ਜਾਣਕਾਰੀ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**\n- **ਸਤਰ:** " + p.level + "\n- **ਸਮਾਂ:** " + p.duration + "\n- **ਸਕੂਲ:** " + p.school + "\n- **ਯੋਗਤਾ:** " + p.eligibility + "\n- **ਵਿਸ਼ੇ:** " + p.subjects.join(', ') + "\n- **ਪ੍ਰੀਖਿਆ:** " + p.entrance + "\n\n**ਅਗਲਾ ਕਦਮ:** ਮੌਜੂਦਾ ਫੀਸ ਅਤੇ ਤਾਰੀਖਾਂ ਪੋਰਟਲ 'ਤੇ ਪੁਸ਼ਟੀ ਕਰੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.university
   };
   return map[lang];
@@ -431,13 +443,13 @@ async function handleSend(text) {
     try {
       reply = await backendReply(value, history);
     } catch (err) {
-      reply = '**Answer:** The backend could not be reached (' + err.message + '). Answering from the built-in knowledge base instead.\n\n' + localReply(value);
+      reply = 'The backend could not be reached (' + err.message + '). Answering from the built-in knowledge base instead.\n\n' + localReply(value);
     }
   } else if (s.apiKey) {
     try {
       reply = await modelReply(history);
     } catch (err) {
-      reply = '**Answer:** I could not reach the configured model (' + err.message + '). Falling back to the built-in knowledge base.\n\n' + localReply(value);
+      reply = 'I could not reach the configured model (' + err.message + '). Falling back to the built-in knowledge base.\n\n' + localReply(value);
     }
   } else {
     await new Promise(r => setTimeout(r, 320));
