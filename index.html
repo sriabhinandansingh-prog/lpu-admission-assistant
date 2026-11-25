@@ -66,7 +66,11 @@
   <form method="dialog" id="settingsForm">
     <h2>Settings</h2>
     <label>
-      API key <span class="muted small">(optional, stored in this browser only)</span>
+      Backend URL <span class="muted small">(recommended: keeps the model key server-side)</span>
+      <input type="url" id="backendUrl" placeholder="https://your-backend.example.com">
+    </label>
+    <label>
+      API key <span class="muted small">(only if you have no backend, stored in this browser only)</span>
       <input type="password" id="apiKey" placeholder="sk-...">
     </label>
     <label>
@@ -77,7 +81,7 @@
       Model
       <input type="text" id="model" placeholder="gpt-4o-mini">
     </label>
-    <p class="muted small">Leave the key empty to stay in knowledge-base mode. Never paste a key you do not own, and never commit one to the repository.</p>
+    <p class="muted small">A backend URL is the safe option: the model key stays on the server and is never sent to a visitor's browser. With neither set, the assistant answers from the bundled knowledge base. Never commit a key to the repository.</p>
     <menu>
       <button value="cancel" class="ghost" type="submit">Cancel</button>
       <button value="save" id="saveSettings" type="submit">Save</button>
