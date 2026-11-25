@@ -87,10 +87,10 @@ function findProgramme(text) {
 /* ---------- answer builders ---------- */
 const T = {
   greeting: {
-    en: "Hello! Welcome to the LPU Admission Assistant.\n\nI can help you with courses, eligibility, fees, scholarships, the admission process, LPUNEST, and hostel or campus facilities.\n\nWhat would you like to know?",
-    hi: "नमस्ते! LPU Admission Assistant में आपका स्वागत है।\n\nमैं कोर्स, पात्रता, फीस, छात्रवृत्ति, दाखिला प्रक्रिया, LPUNEST और हॉस्टल की जानकारी दे सकता हूँ।\n\nआप क्या जानना चाहेंगे?",
-    hinglish: "Namaste! LPU Admission Assistant me aapka swagat hai.\n\nMain course, eligibility, fees, scholarship, admission process, LPUNEST aur hostel ki jankari de sakta hoon.\n\nAap kya jaanna chahenge?",
-    pa: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! LPU Admission Assistant ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ।\n\nਮੈਂ ਕੋਰਸ, ਯੋਗਤਾ, ਫੀਸ, ਸਕਾਲਰਸ਼ਿਪ, ਦਾਖਲਾ ਪ੍ਰਕਿਰਿਆ, LPUNEST ਅਤੇ ਹੋਸਟਲ ਬਾਰੇ ਦੱਸ ਸਕਦਾ ਹਾਂ।\n\nਤੁਸੀਂ ਕੀ ਜਾਣਨਾ ਚਾਹੋਗੇ?"
+    en: "Welcome to LPU Admission AssistAI!\n\nI am your AI admission counsellor. I can help you discover courses, check eligibility, understand fees, explore scholarships and learn about the admission process.\n\nHow can I help you today?",
+    hi: "LPU Admission AssistAI में आपका स्वागत है!\n\nमैं आपका AI एडमिशन काउंसलर हूँ। मैं कोर्स खोजने, पात्रता जाँचने, फीस समझने, छात्रवृत्ति देखने और दाखिला प्रक्रिया जानने में मदद कर सकता हूँ।\n\nआज मैं आपकी क्या सहायता कर सकता हूँ?",
+    hinglish: "Welcome to LPU Admission AssistAI!\n\nMain aapka AI admission counsellor hoon. Main course dhoondhne, eligibility check karne, fees samajhne, scholarship dekhne aur admission process jaanne me madad kar sakta hoon.\n\nAaj main aapki kaise madad kar sakta hoon?",
+    pa: "LPU Admission AssistAI ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ!\n\nਮੈਂ ਤੁਹਾਡਾ AI ਦਾਖਲਾ ਕਾਊਂਸਲਰ ਹਾਂ। ਮੈਂ ਕੋਰਸ ਲੱਭਣ, ਯੋਗਤਾ ਜਾਂਚਣ, ਫੀਸ ਸਮਝਣ, ਸਕਾਲਰਸ਼ਿਪ ਦੇਖਣ ਅਤੇ ਦਾਖਲਾ ਪ੍ਰਕਿਰਿਆ ਜਾਣਨ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ।\n\nਅੱਜ ਮੈਂ ਤੁਹਾਡੀ ਕੀ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?"
   },
   fees: {
     en: "**Answer:** I do not have a verified fee figure to give you, so I will not guess one.\n\n**Important details:**\n- Fees depend on the programme, the specialisation and the academic session.\n- Tuition, hostel and other charges are billed separately.\n- Scholarship deductions are shown separately from the base fee.\n\n**Next step:** Open the admission portal, select your programme, and read the fee section for the current session. A counsellor can confirm the exact amount.\n\n**Official link:** " + LINKS.admissions,
@@ -264,6 +264,47 @@ function programmeDetail(p, lang) {
   return map[lang];
 }
 
+/* One question at a time: when a student states a goal rather than a question,
+   ask the single most useful follow-up instead of dumping a course page. */
+function followUp(p, lang) {
+  const level = p.level;
+  const q = {
+    UG: {
+      en: "Great! Are you currently studying in Class 12, or have you already completed it?",
+      hi: "बहुत अच्छा! आप अभी 12वीं में पढ़ रहे हैं या पूरी कर चुके हैं?",
+      hinglish: "Great! Aap abhi Class 12 me padh rahe ho, ya complete kar chuke ho?",
+      pa: "ਵਧੀਆ! ਤੁਸੀਂ ਹੁਣ 12ਵੀਂ ਵਿੱਚ ਪੜ੍ਹ ਰਹੇ ਹੋ ਜਾਂ ਪੂਰੀ ਕਰ ਚੁੱਕੇ ਹੋ?"
+    },
+    PG: {
+      en: "Great! Have you completed your bachelor's degree?",
+      hi: "बहुत अच्छा! क्या आपने स्नातक पूरी कर ली है?",
+      hinglish: "Great! Aapne graduation complete kar li hai?",
+      pa: "ਵਧੀਆ! ਕੀ ਤੁਸੀਂ ਗ੍ਰੈਜੂਏਸ਼ਨ ਪੂਰੀ ਕਰ ਲਈ ਹੈ?"
+    },
+    Diploma: {
+      en: "Great! Are you in Class 10 or Class 12 right now?",
+      hi: "बहुत अच्छा! आप अभी 10वीं में हैं या 12वीं में?",
+      hinglish: "Great! Aap abhi Class 10 me ho ya Class 12 me?",
+      pa: "ਵਧੀਆ! ਤੁਸੀਂ ਹੁਣ 10ਵੀਂ ਵਿੱਚ ਹੋ ਜਾਂ 12ਵੀਂ ਵਿੱਚ?"
+    },
+    Doctoral: {
+      en: "Great! Have you completed your master's degree?",
+      hi: "बहुत अच्छा! क्या आपने परास्नातक पूरी कर ली है?",
+      hinglish: "Great! Aapne master's complete kar li hai?",
+      pa: "ਵਧੀਆ! ਕੀ ਤੁਸੀਂ ਮਾਸਟਰ ਡਿਗਰੀ ਪੂਰੀ ਕਰ ਲਈ ਹੈ?"
+    }
+  };
+  return (q[level] || q.UG)[lang];
+}
+
+const GOAL_RE = /(admission|दाखिला|ਦਾਖਲਾ|chahiye|lena|lena hai|apply karna)/i;
+const DETAIL_RE = /(about|know|details|information|batao|bataiye|jankari|ke baare|बारे|ਬਾਰੇ|eligible|eligib|fee|fees|hostel|placement|scholarship)/i;
+
+function isGoalStatement(text, programme) {
+  if (!programme) return false;
+  return GOAL_RE.test(text) && !DETAIL_RE.test(text);
+}
+
 /* ---------- knowledge-base reply ---------- */
 function localReply(text) {
   const lang = detectLanguage(text);
@@ -282,6 +323,7 @@ function localReply(text) {
   if (intent === 'campus') return campusAnswer(lang);
   if (intent === 'contact') return contactAnswer(lang);
   if (intent === 'programmes') return programmeList(lang);
+  if (programme && isGoalStatement(text, programme)) return followUp(programme, lang);
   if (programme) return programmeDetail(programme, lang);
   return T.fallback[lang];
 }

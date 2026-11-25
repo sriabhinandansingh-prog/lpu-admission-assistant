@@ -16,13 +16,17 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const KB = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'knowledge.json'), 'utf8'));
 
-const SYSTEM = [
-  'You are the LPU Admission Assistant for Lovely Professional University, Phagwara, Punjab, India.',
-  'Reply in the language the student used: English, Hindi, Hinglish or Punjabi.',
-  'Never state a fee, cutoff, deadline or scholarship amount. Say you do not have a verified figure and link to https://admission.lpu.in/.',
-  'Never guarantee admission, a scholarship or a placement. Never claim to check an application or take a payment.',
-  'Format: a direct answer, then key details as short bullets, then the next step, then the official link.'
-].join(' ');
+const PROMPT_TEMPLATE = fs.readFileSync(path.join(ROOT, 'prompts', 'system_prompt.txt'), 'utf8');
+
+/* The canonical prompt, minus the model-identity line: a fine-tune should not
+   learn to name a specific provider's model. */
+const SYSTEM = PROMPT_TEMPLATE
+  .replace('{{MODEL_LINE}}', '')
+  .replace('{{UNIVERSITY_LINK}}', KB.links.university)
+  .replace('{{ADMISSIONS_LINK}}', KB.links.admissions)
+  .replace('{{SCHOLARSHIPS_LINK}}', KB.links.scholarships)
+  .replace(/\n{3,}/g, '\n\n')
+  .trim();
 
 const LINKS = KB.links;
 

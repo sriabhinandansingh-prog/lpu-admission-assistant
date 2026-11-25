@@ -1,12 +1,22 @@
-# LPU Admission Assistant
+# LPU Admission AssistAI
 
-An admission-counsellor chatbot for Lovely Professional University, with three layers that each do one job:
+LPU Admission AssistAI: an admission-counsellor chatbot for Lovely Professional University, with three layers that each do one job:
 
 1. **A static site** on GitHub Pages: the chat interface, plus a bundled knowledge-base engine so it works with no server at all.
 2. **A backend** (`server/`): retrieval over the knowledge base, then an optional model call with the key held server-side.
 3. **A LoRA fine-tune kit** (`train/`): teaches the assistant *how* to answer (shape, language, refusals), not *what* is true.
 
 **Live site:** https://sriabhinandansingh-prog.github.io/lpu-admission-assistant/
+
+## The system prompt
+
+`prompts/system_prompt.txt` is the single source of truth for the assistant's instructions: identity, the four languages, the one-question-at-a-time conversation rule, the accuracy rules, response style and the official links. The backend and the dataset builder both load that file, so there is one prompt to edit, not three copies.
+
+It uses three placeholders: `{{MODEL_LINE}}`, and the university, admissions and scholarships links. The model line stays empty unless a real model is serving replies, so the assistant never claims to be a model that is not answering. Once the backend is actually pointed at one, set `MODEL_DISPLAY_NAME`:
+
+```bash
+MODEL_API_KEY=... MODEL_NAME=nvidia/nemotron-3.5-bolt-e4b MODEL_DISPLAY_NAME="NVIDIA Nemotron 3.5 Bolt E4B" node server/server.js
+```
 
 ## Why the split
 

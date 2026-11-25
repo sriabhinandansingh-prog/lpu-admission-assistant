@@ -40,20 +40,31 @@ try {
 }
 
 const LINKS = KB.links;
-const SYSTEM_PROMPT = [
-  'You are the LPU Admission Assistant for Lovely Professional University, Phagwara, Punjab, India.',
-  'Reply in the language the student used: English, Hindi, Hinglish or Punjabi.',
-  '',
-  'GROUNDING RULES - these override everything else:',
-  '1. Answer only from the CONTEXT passages below.',
-  '2. Never state a fee, cutoff, deadline or scholarship amount. Those are not in the context. Say you do not have a verified figure and point to ' + LINKS.admissions + '.',
-  '3. If the context does not cover the question, say so plainly instead of guessing.',
-  '4. Never guarantee admission, a scholarship or a placement.',
-  '5. Never claim to check an application status, take a payment, or access the university database.',
-  '',
-  'FORMAT: a direct answer, then key details as short bullets, then the next step, then the official link.',
-  'Official links: university ' + LINKS.university + ' | admissions ' + LINKS.admissions
-].join('\n');
+const PROMPT_PATH = process.env.PROMPT_PATH || path.join(__dirname, '..', 'prompts', 'system_prompt.txt');
+
+/* The prompt names the model only when a real model is serving the reply.
+   Set MODEL_DISPLAY_NAME once the backend is actually pointed at that model,
+   so the assistant never claims to be a model that is not answering. */
+function loadSystemPrompt() {
+  const raw = fs.readFileSync(PROMPT_PATH, 'utf8');
+  const identity = process.env.MODEL_DISPLAY_NAME || (MODEL_API_KEY ? MODEL_NAME : '');
+  const modelLine = identity ? 'Your AI model is ' + identity + '.' : '';
+  return raw
+    .replace('{{MODEL_LINE}}', modelLine)
+    .replace('{{UNIVERSITY_LINK}}', LINKS.university)
+    .replace('{{ADMISSIONS_LINK}}', LINKS.admissions)
+    .replace('{{SCHOLARSHIPS_LINK}}', LINKS.scholarships)
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+let SYSTEM_PROMPT = '';
+try {
+  SYSTEM_PROMPT = loadSystemPrompt();
+} catch (err) {
+  console.error('Could not load the system prompt at ' + PROMPT_PATH + ': ' + err.message);
+  process.exit(1);
+}
 
 /* ---------- rate limiting ---------- */
 const hits = new Map();
@@ -106,32 +117,83 @@ function readBody(req, limit = 32000) {
   });
 }
 
+/* One question at a time, same rule the frontend and the prompt follow:
+   a stated goal gets the single most useful follow-up, not a page of text. */
+const GOAL_RE = /(admission|\u0926\u093e\u0916\u093f\u0932\u093e|\u0A26\u0A3E\u0A16\u0A32\u0A3E|chahiye|lena|apply karna)/i;
+const DETAIL_RE = /(about|know|details|information|batao|bataiye|jankari|ke baare|eligible|eligib|fee|fees|hostel|placement|scholarship|how|when|where|process|procedure)/i;
+
+/* Match the programme the student actually named, not whichever programme
+   chunk happened to score first. */
+function findProgramme(question) {
+  const q = ' ' + question.toLowerCase().replace(/[^a-z0-9\u0900-\u097F\u0A00-\u0A7F ]/g, ' ').replace(/\s+/g, ' ') + ' ';
+  const squash = q.replace(/ /g, '');
+  const aliases = {
+    btech: ['b.tech', 'btech', 'b tech', 'engineering'],
+    bca: ['bca'],
+    bba: ['bba'],
+    bcom: ['b.com', 'bcom', 'b com'],
+    bsc: ['b.sc', 'bsc', 'b sc'],
+    bdes: ['b.des', 'bdes'],
+    bpharm: ['b.pharm', 'bpharm', 'pharmacy'],
+    llb: ['llb', 'law'],
+    mba: ['mba'],
+    mca: ['mca'],
+    mtech: ['m.tech', 'mtech'],
+    msc: ['m.sc', 'msc'],
+    phd: ['phd', 'doctorate'],
+    diploma: ['diploma']
+  };
+  let best = null;
+  let bestLen = 0;
+  for (const prog of KB.programmes) {
+    const keys = (aliases[prog.id] || [prog.name.toLowerCase()]).concat([prog.name.toLowerCase()]);
+    for (const k of keys) {
+      const needle = k.replace(/ /g, '');
+      if (!needle) continue;
+      const hit = squash.includes(needle) || q.includes(' ' + k + ' ');
+      if (hit && needle.length > bestLen) {
+        best = prog;
+        bestLen = needle.length;
+      }
+    }
+  }
+  return best;
+}
+
+function goalFollowUp(question, chunks) {
+  if (!GOAL_RE.test(question) || DETAIL_RE.test(question)) return null;
+  const prog = findProgramme(question);
+  if (!prog) return null;
+  if (prog.level === 'Doctoral') return "Great! Have you completed your master's degree?";
+  if (prog.level === 'PG') return "Great! Have you completed your bachelor's degree?";
+  if (prog.level === 'Diploma') return 'Great! Are you in Class 10 or Class 12 right now?';
+  return 'Great! Are you currently studying in Class 12, or have you already completed it?';
+}
+
 function retrievalAnswer(chunks) {
   if (!chunks.length) {
     return [
-      '**Answer:** I do not have a verified answer for that in my knowledge base.',
+      'I do not have a verified answer for that in my knowledge base.',
       '',
-      '**Important details:**',
       '- I answer only from a fixed set of LPU programme, admission, scholarship and hostel notes.',
       '- I would rather say so than invent a detail.',
       '',
-      '**Next step:** Try asking about a specific course, eligibility, scholarships or the admission process, or check the official portal.',
+      'Next step: try asking about a specific course, eligibility, scholarships or the admission process.',
       '',
-      '**Official link:** ' + LINKS.admissions
+      'Official link: ' + LINKS.admissions
     ].join('\n');
   }
   const top = chunks[0];
   const extra = chunks.slice(1, 3).map(c => `- Also relevant: ${c.title}`).join('\n');
   return [
-    '**Answer:** ' + top.text,
+    top.text,
     '',
-    '**Important details:**',
-    '- Source: ' + top.kind + ' notes, no verified fee or cutoff figures are stored.',
+    '- Source: ' + top.kind + ' notes. No verified fee or cutoff figures are stored here.',
     extra,
     '',
-    '**Next step:** Confirm the current fee and dates for your programme on the official portal.',
+    'Next step: confirm the current fee and dates for your programme on the official portal.',
     '',
-    '**Official link:** ' + (top.link || LINKS.admissions)
+    'Official link: ' + (top.link || LINKS.admissions)
   ].filter(Boolean).join('\n');
 }
 
@@ -192,6 +254,8 @@ const server = http.createServer(async (req, res) => {
       mode: MODEL_API_KEY ? 'model' : 'retrieval',
       model: MODEL_API_KEY ? MODEL_NAME : null,
       chunks: CHUNK_COUNT,
+      assistant: 'LPU Admission AssistAI',
+      identity: process.env.MODEL_DISPLAY_NAME || (MODEL_API_KEY ? MODEL_NAME : 'retrieval-only'),
       session: KB.meta && KB.meta.session,
       verified: KB.meta && KB.meta.verified
     });
@@ -214,7 +278,12 @@ const server = http.createServer(async (req, res) => {
     const chunks = retrieve(question, 4);
 
     if (!MODEL_API_KEY) {
-      return send(res, 200, { mode: 'retrieval', answer: retrievalAnswer(chunks), sources: chunks.map(c => c.id) });
+      const follow = goalFollowUp(question, chunks);
+      return send(res, 200, {
+        mode: 'retrieval',
+        answer: follow || retrievalAnswer(chunks),
+        sources: chunks.map(c => c.id)
+      });
     }
 
     try {
@@ -238,6 +307,7 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log('LPU Admission Assistant backend on http://localhost:' + PORT);
   console.log('  mode: ' + (MODEL_API_KEY ? 'model (' + MODEL_NAME + ')' : 'retrieval-only (no MODEL_API_KEY set)'));
+  console.log('  assistant: LPU Admission AssistAI | prompt: ' + PROMPT_PATH);
   console.log('  knowledge chunks: ' + CHUNK_COUNT);
   console.log('  cors origin: ' + ALLOWED_ORIGIN);
   if (STATIC_DIR) console.log('  serving static site from ' + STATIC_DIR);
