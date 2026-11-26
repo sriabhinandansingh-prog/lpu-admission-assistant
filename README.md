@@ -44,12 +44,42 @@ Fees, cutoffs, deadlines and scholarship slabs change every session. A fine-tune
 
 Nothing in this repo invents a fee. Every layer says "I do not have a verified figure" and links to https://admission.lpu.in/ instead.
 
+## Live verification (every answer is checked, not just written)
+
+A knowledge base is a snapshot; a university site is not. So the assistant now browses before it answers and checks after it answers.
+
+1. **Browse.** `base44/lpuVerify.ts` fetches `admission.lpu.in`, the scholarship page and `lpu.in` at request time and pulls out the lines that actually change: what is open, what is closing, the scholarship headline, the session. Those lines go into the model's context, so "is admission open" is answered from today's site instead of "I do not know".
+2. **Answer.** The model writes the reply from the retrieved notes plus those live lines, and is told not to extend them.
+3. **Verify.** The finished reply goes back to the same function. Every amount, percentage, date, phone number, email and link in it is matched against the text that was just fetched from the official pages (and, failing that, against the knowledge base). The reply is then labelled:
+
+| Verdict | Meaning |
+| --- | --- |
+| `verified` | Every figure in the reply was found on an official page minutes ago |
+| `partly_verified` | Some figures come only from the knowledge base, not from a live page |
+| `unverified` | A figure was not found anywhere official and is listed by name |
+| `unavailable` | The official pages could not be reached, so nothing was checked |
+
+The site shows that label, the pages it checked and the time of the check under every reply, so a student can see what is confirmed and what is not.
+
+Endpoints:
+
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
+| `/functions/lpuVerify` | GET | which official pages are reachable right now, plus today's live lines |
+| `/functions/lpuVerify` | POST `{ question }` | live context only, used before answering |
+| `/functions/lpuVerify` | POST `{ answer }` | the check: verdict, checked figures, unverified claims, unofficial links |
+| `/functions/lpuChat` | POST `{ question, history }` | browse → answer → verify, returns `{ answer, live_signals, verification }` |
+
+Deploying `lpuChat` yourself needs `NVIDIA_API_KEY` saved as an app secret; without it the function still runs, in retrieval-only mode, and every reply is still verified. `lpuVerify` needs no secret at all.
+
 ## The static site
 
 ```
 index.html              chat shell
 styles.css              styling
 app.js                  language detection, intent matching, answer builders, backend client
+base44/lpuVerify.ts     live browse + verification of every reply
+base44/lpuChat.ts       model layer: browse, answer, verify
 data/knowledge.json     the knowledge base - edit this, not the JS
 .nojekyll               tells Pages to serve files as-is
 ```

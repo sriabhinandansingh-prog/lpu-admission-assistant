@@ -22,6 +22,14 @@ const formEl = document.getElementById('composer');
    with no setup step at all. The model key stays on that server. */
 const DEFAULT_BACKEND = 'https://superagent-c912e94b.base44.app/functions/lpuChat';
 
+/* Live verification. Every reply - model-written, knowledge-base or offline -
+   is sent here after it is generated. That function fetches admission.lpu.in,
+   the scholarship page and lpu.in right then, and checks every amount,
+   percentage, date, phone and link in the reply against them. The result is
+   shown under the message, so a student can see what was actually verified and
+   what is only from the assistant's notes. */
+const VERIFY_ENDPOINT = 'https://superagent-a46bd31e.base44.app/functions/lpuVerify';
+
 
 /* ---------- language ---------- */
 const HINGLISH = /\b(kya|kaise|kaisi|kitna|kitni|kitne|hai|hain|nahi|nahin|mera|meri|mujhe|batao|bataiye|chahiye|karna|karni|hoga|hogi|kaun|kab|kahan|acha|thik|bhai|dost|krna|krni|kro|bta)\b/i;
@@ -365,21 +373,80 @@ function systemPrompt() {
   ].join('\n\n');
 }
 
-async function backendReply(question, history) {
+async function backendReply(question, history, liveSignals) {
   const base = DEFAULT_BACKEND.replace(/\/+$/, '');
   const url = /\/functions\/[^/]+$/.test(base) ? base : base + '/api/chat';
+  const turns = history.slice(-8).map(m => ({ role: m.role, content: m.content }));
+  const liveLine = (liveSignals || [])
+    .slice(0, 3)
+    .map(s => s.label + ': ' + s.text + ' (' + s.url + ')')
+    .join(' | ');
+  if (liveLine && turns.length) {
+    /* The model gets the lines that were just fetched from the official pages,
+       so it can answer "is admission open" from today's site instead of saying
+       it does not know. The line is marked as live and not to be extended. */
+    turns.splice(turns.length - 1, 0, {
+      role: 'user',
+      content: '[Live context, fetched from the official LPU pages a moment ago. Quote these lines as current if relevant; do not invent anything beyond them] ' + liveLine
+    });
+  }
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      question,
-      history: history.slice(-8).map(m => ({ role: m.role, content: m.content }))
-    })
+    body: JSON.stringify({ question, history: turns })
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   if (!data.answer) throw new Error('No answer in response');
-  return data.answer;
+  return { answer: data.answer, liveSignals: Array.isArray(data.live_signals) ? data.live_signals : [] };
+}
+
+/* Browse the official pages for this question: what is open, what is closing,
+   what the scholarship headline says today. Runs in parallel with the answer,
+   so the live notices shown under the reply are from a real fetch, not a guess. */
+let liveCache = { at: 0, signals: [] };
+
+async function browseLive(question) {
+  if (liveCache.signals.length && Date.now() - liveCache.at < 10 * 60 * 1000) return liveCache.signals;
+  try {
+    const res = await fetch(VERIFY_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const signals = Array.isArray(data.live_signals) ? data.live_signals : [];
+    if (signals.length) liveCache = { at: Date.now(), signals };
+    return signals;
+  } catch (err) {
+    return liveCache.signals;
+  }
+}
+
+/* Ask the verification layer to check one finished reply against the official
+   LPU pages, fetched live at that moment. Never throws: a failed check is
+   reported as 'unavailable', not hidden. */
+async function verifyAnswer(answer) {
+  try {
+    const res = await fetch(VERIFY_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answer })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.verdict) throw new Error('No verdict');
+    return data;
+  } catch (err) {
+    return {
+      ok: false,
+      verdict: 'unavailable',
+      headline: 'The live check could not run for this reply, so treat its figures as unconfirmed.',
+      checked_at_local: '',
+      live_signals: []
+    };
+  }
 }
 
 /* ---------- rendering ---------- */
@@ -390,17 +457,42 @@ function escapeHtml(str) {
 function formatMessage(text) {
   let html = escapeHtml(text);
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  html = html.replace(/(https?:\/\/[^\s<]*[^\s<.,;:)])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
   return html;
 }
 
-function addMessage(role, text) {
+function addMessage(role, text, meta) {
   const div = document.createElement('div');
   div.className = 'msg ' + (role === 'user' ? 'user' : role === 'error' ? 'bot error' : 'bot');
-  div.innerHTML = formatMessage(text);
+  div.innerHTML = formatMessage(text) + (meta ? verificationHtml(meta) : '');
   messagesEl.appendChild(div);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   return div;
+}
+
+/* The line under a bot reply: what was checked, where, and when. */
+function verificationHtml(meta) {
+  const v = meta.verification;
+  if (!v) return '';
+  const labels = {
+    verified: 'Live-checked',
+    partly_verified: 'Partly checked',
+    unverified: 'Not verified',
+    unavailable: 'Check unavailable',
+    nothing_to_check: 'Sources reachable'
+  };
+  const label = labels[v.verdict] || 'Checked';
+  const hosts = (v.sources || []).filter(s => s.ok).map(s => {
+    try { return new URL(s.url).hostname; } catch (e) { return s.url; }
+  });
+  const where = hosts.length ? ' on ' + Array.from(new Set(hosts)).join(', ') : '';
+  const when = v.checked_at_local ? ' · ' + v.checked_at_local : '';
+  const detail = v.headline ? '<span class="vwhy">' + escapeHtml(v.headline) + '</span>' : '';
+  const signals = (meta.liveSignals || v.live_signals || []).slice(0, 2).map(s =>
+    '<span class="vsignal">' + escapeHtml(s.text) + '</span>'
+  ).join('');
+  return '<div class="verify v-' + escapeHtml(v.verdict || 'unavailable') + '">' +
+    '<span class="vbadge">' + label + where + when + '</span>' + detail + signals + '</div>';
 }
 
 function addTyping() {
@@ -426,14 +518,20 @@ async function handleSend(text) {
 
   const typing = addTyping();
   let reply;
+  let liveSignals = await browseLive(value);
   try {
-    reply = await backendReply(value, history);
+    const data = await backendReply(value, history, liveSignals);
+    reply = data.answer;
+    if (data.liveSignals && data.liveSignals.length) liveSignals = data.liveSignals;
   } catch (err) {
     reply = 'I could not reach the assistant service just now, so here is the answer from the built-in knowledge base.\n\n' + localReply(value);
   }
 
+  /* every reply is verified against the official pages before it is shown */
+  const verification = await verifyAnswer(reply);
+
   typing.remove();
-  addMessage('bot', reply);
+  addMessage('bot', reply, { verification, liveSignals });
   history.push({ role: 'assistant', content: reply });
   sendBtn.disabled = false;
   inputEl.focus();

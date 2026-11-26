@@ -246,3 +246,48 @@ dialog menu button#saveSettings { background: var(--accent); border-color: var(-
   .messages { padding: 16px; }
   .chips, .composer, .disclaimer { padding-left: 16px; padding-right: 16px; }
 }
+
+/* ---------- live verification badge ---------- */
+.verify {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.verify .vbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  font-weight: 620;
+  letter-spacing: .01em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #f7f8fa;
+  color: var(--ink-soft);
+}
+.verify .vbadge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .85;
+}
+.verify .vwhy { color: var(--ink-soft); }
+.verify .vsignal {
+  color: var(--ink-soft);
+  background: #f7f8fa;
+  border-left: 2px solid var(--line);
+  padding: 2px 0 2px 8px;
+}
+.verify.v-verified .vbadge { background: #eaf7ef; border-color: #bfe6cd; color: #1c6b3a; }
+.verify.v-partly_verified .vbadge { background: #fdf6e3; border-color: #f0e0b0; color: #7a5a10; }
+.verify.v-unverified .vbadge { background: #fdeceb; border-color: #f6c9c4; color: #8d2418; }
+.verify.v-unavailable .vbadge,
+.verify.v-nothing_to_check .vbadge { background: #f2f3f6; border-color: var(--line); color: var(--ink-soft); }
