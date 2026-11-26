@@ -79,3 +79,19 @@ If the model lives on your own machine, the host must be able to reach it. Put b
 - **`401` or `403` from the model.** The key or endpoint is wrong. The health endpoint tells you whether a key is even set.
 - **Model answers ignore the rules.** The system prompt is `prompts/system_prompt.txt` and is loaded at boot. Edit it and redeploy; there is only one copy.
 - **Answers look templated after you set a key.** The endpoint responded with an error and the backend fell back to retrieval. Check the logs.
+
+---
+
+## Option 0: Base44 function (already live)
+
+The backend is deployed at:
+
+```
+https://superagent-c912e94b.base44.app/functions/lpuAssist
+```
+
+`GET` returns health and the data-trust summary. `POST` with `{"question": "..."}` answers.
+
+It is retrieval-only, so it needs no model key. To switch on model-written answers, save `MODEL_API_KEY`, `MODEL_ENDPOINT` and `MODEL_NAME` as app secrets, then redeploy `base44/lpuAssist.ts` with the model branch enabled (the file at `functions/lpuAssist.ts` in the agent workspace is the deployed source).
+
+The site already points here: `DEFAULT_BACKEND` in `app.js` is set to this URL, so every visitor uses it with no setup.
