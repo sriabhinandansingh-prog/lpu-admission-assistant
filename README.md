@@ -72,6 +72,20 @@ Endpoints:
 
 Deploying `lpuChat` yourself needs `NVIDIA_API_KEY` saved as an app secret; without it the function still runs, in retrieval-only mode, and every reply is still verified. `lpuVerify` needs no secret at all.
 
+## Scope: an admission assistant, not a general chatbot
+
+Ask it "what is AI" and it answers like a person, not like a search box:
+
+> Straight answer: I'm the LPU admission assistant, not a personal or general-purpose chatbot, so that one is outside what I handle.
+> What I do know properly is LPU: courses, eligibility, fees, scholarships, hostel and the admission process.
+> Which of those can I help you with?
+
+Three things make that work:
+
+- `app.js` checks scope before calling the backend, so an unrelated question never pulls up a programme page that happened to share a keyword. Short answers inside a live conversation ("yes", "78%", "class 12") stay in scope, and a bare answer is sent with the question it is replying to.
+- The reply comes in the student's language (English, Hindi, Hinglish, Punjabi), and the off-topic reply is still sent to the verification API, so the badge under it is honest: no facts to check.
+- `prompts/system_prompt.txt` carries the same rule for the model, and `base44/lpuAssist.ts` carries it for the retrieval-only path, so a self-hosted deployment behaves the same way.
+
 ## The static site
 
 ```

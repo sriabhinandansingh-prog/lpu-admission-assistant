@@ -105,8 +105,53 @@ function findProgramme(text) {
   return best;
 }
 
+/* ---------- scope guard ----------
+   This is an admission assistant, not a general-purpose chatbot. If a student
+   asks something outside admissions ("what is AI"), it answers like a person
+   would: says plainly what it is and what it can help with, then offers the
+   next step. It never pastes a programme page that merely matched a keyword. */
+const SCOPE_RE = /(lpu|lpunest|lpu\s*nest|admission|admit|apply|application|dakhila|दाखिला|ਦਾਖਲ|course|programme|program\b|branch|stream|specialis|specializ|subject|semester|session|fee|fees|शुल्क|फीस|ਫੀਸ|kharcha|cost|scholarship|schol|छात्रवृत्ति|ਸਕਾਲਰਸ਼ਿਪ|concession|hostel|mess|accommodation|हॉस्टल|ਹੋਸਟਲ|rehna|eligib|योग्यता|ਯੋਗਤਾ|yogyata|entrance|jee|neet|cat\b|gate\b|clat|placement|internship|package|naukri|campus|library|sports|club|contact|helpline|email|address|cutoff|cut-off|deadline|last date|result|counselling|counsel|seat|intake|b\.?tech|btech|bca|bba|b\.?com|bcom|b\.?sc|bsc|bdes|bpharm|pharm|llb|law|mba|mca|m\.?tech|mtech|m\.?sc|msc|phd|doctorate|diploma|cse|ece|eee|mechanical|civil|aiml|artificial intelligence|data science|cyber|cloud|lateral|detain|attendance|document|migration|scholarships?|hostels?)/i;
+
+function onTopic(text) {
+  if (SCOPE_RE.test(text)) return true;
+  if (findProgramme(text)) return true;
+  if (detectIntent(text) !== 'fallback') return true;
+  if (KB) {
+    const t = ' ' + text.toLowerCase() + ' ';
+    for (const p of KB.programmes || []) {
+      const name = String(p.name || '').toLowerCase();
+      const school = String(p.school || '').toLowerCase();
+      if (name.length > 3 && t.includes(name)) return true;
+      if (school.length > 6 && t.includes(school)) return true;
+    }
+  }
+  return false;
+}
+
+/* Short answers inside a live conversation ("class 12", "yes", "60%") are the
+   student answering the assistant's own follow-up, so they stay in scope. */
+const CONTINUATION_RE = /^(yes|yeah|yep|ya|haan|ha|han|ok|okay|no|nahi|nah|nope|sure|thik|theek|class\s?12|12th|12|class\s?10|graduation|graduate|bachelor|master|diploma|lateral|pcm|pcb|science|commerce|arts|2026|2027|60%|70%|80%)\s*[.!]?$/i;
+
+function isOffTopic(text, history) {
+  if (onTopic(text)) return false;
+  const t = text.trim();
+  if (CONTINUATION_RE.test(t)) return false;
+  /* A short numeric or personal answer ("78%", "I did 12th with PCM") is the
+     student replying to the assistant's own follow-up, so it stays in scope. */
+  const hadExchange = history.some(m => m.role === 'assistant');
+  if (hadExchange && /^[\d\s%.,+-]{1,8}$/.test(t)) return false;
+  if (hadExchange && t.length < 60 && /^(i\s|i'm|i am|my\s|class\s?(10|12))/i.test(t)) return false;
+  return true;
+}
+
 /* ---------- answer builders ---------- */
 const T = {
+  scope: {
+    en: "Straight answer: I'm the LPU admission assistant, not a personal or general-purpose chatbot, so that one is outside what I handle.\n\nWhat I do know properly is LPU: courses, eligibility, fees, scholarships, hostel and the admission process.\n\nWhich of those can I help you with?",
+    hi: "सीधा जवाब: मैं LPU का admission assistant हूँ, कोई personal या general chatbot नहीं, इसलिए यह मेरे काम का हिस्सा नहीं है।\n\nजो मुझे ठीक से पता है वह LPU है: कोर्स, पात्रता, फीस, छात्रवृत्ति, हॉस्टल और दाखिला प्रक्रिया।\n\nइनमें से किसमें मदद करूँ?",
+    hinglish: "Seedha jawab: main LPU ka admission assistant hoon, koi personal ya general chatbot nahi, isliye yeh mere kaam ka hissa nahi hai.\n\nJo mujhe theek se pata hai wo LPU hai: courses, eligibility, fees, scholarship, hostel aur admission process.\n\nInme se kis cheez me madad karun?",
+    pa: "ਸਿੱਧਾ ਜਵਾਬ: ਮੈਂ LPU ਦਾ admission assistant ਹਾਂ, ਕੋਈ personal ਜਾਂ general chatbot ਨਹੀਂ, ਇਸ ਲਈ ਇਹ ਮੇਰੇ ਕੰਮ ਦਾ ਹਿੱਸਾ ਨਹੀਂ।\n\nਜੋ ਮੈਨੂੰ ਠੀਕ ਤਰ੍ਹਾਂ ਪਤਾ ਹੈ ਉਹ LPU ਹੈ: ਕੋਰਸ, ਯੋਗਤਾ, ਫੀਸ, ਸਕਾਲਰਸ਼ਿਪ, ਹੋਸਟਲ ਅਤੇ ਦਾਖਲਾ ਪ੍ਰਕਿਰਿਆ।\n\nਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਕਿਸ ਵਿੱਚ ਮਦਦ ਕਰਾਂ?"
+  },
   greeting: {
     en: "Welcome to LPU Admission AssistAI!\n\nI am your AI admission counsellor. I can help you discover courses, check eligibility, understand fees, explore scholarships and learn about the admission process.\n\nHow can I help you today?",
     hi: "LPU Admission AssistAI में आपका स्वागत है!\n\nमैं आपका AI एडमिशन काउंसलर हूँ। मैं कोर्स खोजने, पात्रता जाँचने, फीस समझने, छात्रवृत्ति देखने और दाखिला प्रक्रिया जानने में मदद कर सकता हूँ।\n\nआज मैं आपकी क्या सहायता कर सकता हूँ?",
@@ -390,10 +435,18 @@ async function backendReply(question, history, liveSignals) {
       content: '[Live context, fetched from the official LPU pages a moment ago. Quote these lines as current if relevant; do not invent anything beyond them] ' + liveLine
     });
   }
+  /* A bare answer like "78%" carries no keywords, so the retrieval step has
+     nothing to match. Give it the question it is answering. */
+  const words = question.trim().split(/\s+/).filter(Boolean).length;
+  const prevBot = [...history].reverse().find(m => m.role === 'assistant' && m.content);
+  const asked = words <= 6 && prevBot
+    ? question + ' (replying to: ' + String(prevBot.content).replace(/\s+/g, ' ').slice(0, 160) + ')'
+    : question;
+
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question, history: turns })
+    body: JSON.stringify({ question: asked, history: turns })
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
@@ -479,7 +532,7 @@ function verificationHtml(meta) {
     partly_verified: 'Partly checked',
     unverified: 'Not verified',
     unavailable: 'Check unavailable',
-    nothing_to_check: 'Sources reachable'
+    nothing_to_check: 'No facts to check'
   };
   const label = labels[v.verdict] || 'Checked';
   const hosts = (v.sources || []).filter(s => s.ok).map(s => {
@@ -515,6 +568,19 @@ async function handleSend(text) {
   history.push({ role: 'user', content: value });
   inputEl.value = '';
   sendBtn.disabled = true;
+
+  /* Out of scope? Answer like a person, not a search box. */
+  if (isOffTopic(value, history)) {
+    const typing = addTyping();
+    const reply = T.scope[detectLanguage(value)] || T.scope.en;
+    const verification = await verifyAnswer(reply);
+    typing.remove();
+    addMessage('bot', reply, { verification, liveSignals: [] });
+    history.push({ role: 'assistant', content: reply });
+    sendBtn.disabled = false;
+    inputEl.focus();
+    return;
+  }
 
   const typing = addTyping();
   let reply;

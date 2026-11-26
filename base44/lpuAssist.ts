@@ -220,6 +220,38 @@ async function load() {
   return cache;
 }
 
+/* ---------- scope ----------
+   An admission assistant, not a general chatbot. An off-topic question gets a
+   short, human answer about what this assistant actually does - never a
+   programme chunk that happened to share a keyword. */
+const SCOPE =
+  /(lpu|lpunest|admission|admit|apply|application|dakhila|दाखिला|ਦਾਖਲ|course|programme|program\b|branch|stream|specialis|specializ|subject|semester|session|fee|fees|शुल्क|फीस|ਫੀਸ|kharcha|cost|scholarship|schol|छात्रवृत्ति|ਸਕਾਲਰਸ਼ਿਪ|hostel|mess|accommodation|हॉस्टल|ਹੋਸਟਲ|rehna|eligib|योग्यता|ਯੋਗਤਾ|entrance|jee|neet|cat\b|gate\b|clat|placement|internship|package|naukri|campus|library|sports|club|contact|helpline|email|address|cutoff|deadline|last date|result|counselling|counsel|seat|intake|b\.?tech|btech|bca|bba|b\.?com|bcom|b\.?sc|bsc|bdes|bpharm|pharm|llb|law|mba|mca|m\.?tech|mtech|m\.?sc|msc|phd|doctorate|diploma|cse|ece|eee|mechanical|civil|aiml|artificial intelligence|data science|cyber|cloud|lateral|detain|attendance|document|migration)/i;
+
+const SCOPE_REPLY: Record<string, string> = {
+  en: "Straight answer: I'm the LPU admission assistant, not a personal or general-purpose chatbot, so that one is outside what I handle.\n\nWhat I do know properly is LPU: courses, eligibility, fees, scholarships, hostel and the admission process.\n\nWhich of those can I help you with?",
+  hi: "सीधा जवाब: मैं LPU का admission assistant हूँ, कोई personal या general chatbot नहीं, इसलिए यह मेरे काम का हिस्सा नहीं है।\n\nजो मुझे ठीक से पता है वह LPU है: कोर्स, पात्रता, फीस, छात्रवृत्ति, हॉस्टल और दाखिला प्रक्रिया।\n\nइनमें से किसमें मदद करूँ?",
+  hinglish: "Seedha jawab: main LPU ka admission assistant hoon, koi personal ya general chatbot nahi, isliye yeh mere kaam ka hissa nahi hai.\n\nJo mujhe theek se pata hai wo LPU hai: courses, eligibility, fees, scholarship, hostel aur admission process.\n\nInme se kis cheez me madad karun?",
+  pa: "ਸਿੱਧਾ ਜਵਾਬ: ਮੈਂ LPU ਦਾ admission assistant ਹਾਂ, ਕੋਈ personal ਜਾਂ general chatbot ਨਹੀਂ, ਇਸ ਲਈ ਇਹ ਮੇਰੇ ਕੰਮ ਦਾ ਹਿੱਸਾ ਨਹੀਂ।\n\nਜੋ ਮੈਨੂੰ ਠੀਕ ਤਰ੍ਹਾਂ ਪਤਾ ਹੈ ਉਹ LPU ਹੈ: ਕੋਰਸ, ਯੋਗਤਾ, ਫੀਸ, ਸਕਾਲਰਸ਼ਿਪ, ਹੋਸਟਲ ਅਤੇ ਦਾਖਲਾ ਪ੍ਰਕਿਰਿਆ।\n\nਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਕਿਸ ਵਿੱਚ ਮਦਦ ਕਰਾਂ?",
+};
+
+function languageOf(text: string): string {
+  if (/[\u0A00-\u0A7F]/.test(text)) return "pa";
+  if (/[\u0900-\u097F]/.test(text)) return "hi";
+  if (/\b(kya|kaise|kitni|kitna|hai|hain|nahi|mera|mujhe|batao|chahiye|karna|hoga|kaun|kab|kahan|bhai|krna|bta)\b/i.test(text)) return "hinglish";
+  return "en";
+}
+
+/* A bare answer to the assistant's own follow-up ("yes", "78%", "class 12")
+   carries no keywords of its own, so it is not treated as off-topic. */
+const CONTINUATION =
+  /^(yes|yeah|yep|ya|haan|ha|han|ok|okay|no|nahi|nah|nope|sure|thik|theek|class\s?1[02](th)?|1[02]th|graduation|graduate|bachelor|master|diploma|lateral|pcm|pcb|science|commerce|arts|20\d\d|\d{1,3}\s?%?)\s*[.!]?$/i;
+
+function scopeReply(question: string): string | null {
+  if (SCOPE.test(question)) return null;
+  if (CONTINUATION.test(question.trim())) return null;
+  return SCOPE_REPLY[languageOf(question)] || SCOPE_REPLY.en;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
 
@@ -257,6 +289,9 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'Body must be JSON like { "question": "..." }' }, 400);
   }
   if (!question) return json({ error: "Ask a question in the 'question' field" }, 400);
+
+  const scope = scopeReply(question);
+  if (scope) return json({ answer: scope, mode: "retrieval", sources: [] });
 
   const hits = retrieve(question, chunks);
   const follow = goalFollowUp(question, kb, hits);
