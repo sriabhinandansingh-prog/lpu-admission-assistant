@@ -114,7 +114,9 @@ Everything factual lives in `data/knowledge.json`. Add a programme by copying an
 Two rules worth keeping:
 
 1. **Do not add fee numbers, cutoffs or deadlines unless you have verified them on admission.lpu.in for the current session.** The assistant is built to say it does not know rather than guess, and that is a feature.
-2. **Set `meta.verified` to `true` only after someone has checked every row against the official site.** `/api/health` reports this flag, so you can see at a glance whether the data is trustworthy.
+2. **Track what has actually been checked.** `meta.verified_sections` lists what was read from an official page and when (`meta.last_checked`); `meta.unverified_sections` lists what is deliberately absent. `/api/health` reports all three, so you can see the state of the data at a glance. Set `meta.verified` to `true` only when nothing is left in the unverified list.
+
+Current state: scholarship categories, bracket criteria and admission phases were read from https://www.lpu.in/scholarship/scholarship.php on 2026-11-26. Fees, cutoffs and deadlines are still absent by design.
 
 After editing the knowledge base, rerun `node train/build_dataset.js` if you intend to retrain, and restart the backend so the index rebuilds.
 

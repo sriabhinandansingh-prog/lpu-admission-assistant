@@ -6,7 +6,8 @@
 
 const LINKS = {
   university: 'https://www.lpu.in/',
-  admissions: 'https://admission.lpu.in/'
+  admissions: 'https://admission.lpu.in/',
+  scholarships: 'https://www.lpu.in/scholarship/scholarship.php'
 };
 
 let KB = null;
@@ -187,20 +188,26 @@ function admissionAnswer(lang) {
 }
 
 function scholarshipAnswer(lang) {
-  const rows = KB.scholarships.map(s => `- **${s.name}:** ${s.detail}`).join('\n');
-  const head = {
-    en: "LPU offers several scholarship categories. I can explain them, but I will not quote an amount.\n\n",
-    hi: "**उत्तर:** LPU में कई छात्रवृत्ति श्रेणियाँ हैं। मैं जानकारी दे सकता हूँ, राशि नहीं बता सकता।\n\n**महत्वपूर्ण जानकारी:**",
-    hinglish: "LPU me kai scholarship categories hain. Main explain kar sakta hoon, amount nahi bata sakta.\n\n",
-    pa: "**ਜਵਾਬ:** LPU ਵਿੱਚ ਕਈ ਸਕਾਲਰਸ਼ਿਪ ਸ਼੍ਰੇਣੀਆਂ ਹਨ। ਮੈਂ ਜਾਣਕਾਰੀ ਦੇ ਸਕਦਾ ਹਾਂ, ਰਕਮ ਨਹੀਂ।\n\n**ਜ਼ਰੂਰੀ ਜਾਣਕਾਰੀ:**"
+  const rows = KB.scholarships.map(x => `- **${x.name}:** ${x.detail}`).join('\n');
+  const b = KB.scholarship_brackets;
+  const L = {
+    en: { head: 'LPU offers a wide range of scholarships. Here are the official categories.', after12: 'Brackets after Class 12, diploma or lateral entry', afterGrad: 'Brackets after graduation', phases: 'Admissions run in phases: Phase-I (January to April) carries the highest scholarship benefit, Phase-II (from May) is lower. The university states these dates are tentative.', noAmt: 'The concession amount per bracket is not published and differs by programme, so I will not quote one.', next: 'Next step: share your Class 12 percentage and any entrance score, then confirm your slab on the official scholarship page.', link: 'Official link' },
+    hi: { head: 'LPU में कई छात्रवृत्ति श्रेणियाँ हैं। ये आधिकारिक श्रेणियाँ हैं।', after12: '12वीं, डिप्लोमा या लेटरल एंट्री के बाद ब्रैकेट', afterGrad: 'स्नातक के बाद ब्रैकेट', phases: 'दाखिला चरणों में होता है: चरण-I (जनवरी से अप्रैल) में सबसे अधिक छात्रवृत्ति मिलती है, चरण-II (मई से) में कम। तिथियाँ परिवर्तनशील हैं।', noAmt: 'प्रत्येक ब्रैकेट की राशि प्रकाशित नहीं है और प्रोग्राम के अनुसार बदलती है, इसलिए मैं राशि नहीं बताऊँगा।', next: 'अगला कदम: 12वीं का प्रतिशत और प्रवेश परीक्षा स्कोर बताएँ, फिर आधिकारिक पेज पर पुष्टि करें।', link: 'आधिकारिक लिंक' },
+    hinglish: { head: 'LPU me kai scholarship categories hain. Ye official categories hain.', after12: 'Class 12, diploma ya lateral entry ke baad brackets', afterGrad: 'Graduation ke baad brackets', phases: 'Admission phases me hota hai: Phase-I (January se April) me sabse zyada scholarship milti hai, Phase-II (May se) me kam. Dates tentative hain.', noAmt: 'Har bracket ka amount publish nahi hai aur programme ke hisaab se badalta hai, isliye main amount nahi bataunga.', next: 'Next step: apna Class 12 percentage aur entrance score batao, phir official page par confirm karo.', link: 'Official link' },
+    pa: { head: 'LPU ਵਿੱਚ ਕਈ ਸਕਾਲਰਸ਼ਿਪ ਸ਼੍ਰੇਣੀਆਂ ਹਨ। ਇਹ ਅਧਿਕਾਰਤ ਸ਼੍ਰੇਣੀਆਂ ਹਨ।', after12: '12ਵੀਂ, ਡਿਪਲੋਮਾ ਜਾਂ ਲੈਟਰਲ ਐਂਟਰੀ ਤੋਂ ਬਾਅਦ ਬ੍ਰੈਕਟ', afterGrad: 'ਗ੍ਰੈਜੂਏਸ਼ਨ ਤੋਂ ਬਾਅਦ ਬ੍ਰੈਕਟ', phases: 'ਦਾਖਲਾ ਪੜਾਵਾਂ ਵਿੱਚ ਹੁੰਦਾ ਹੈ: ਪੜਾਅ-I (ਜਨਵਰੀ ਤੋਂ ਅਪ੍ਰੈਲ) ਵਿੱਚ ਸਭ ਤੋਂ ਵੱਧ ਸਕਾਲਰਸ਼ਿਪ ਮਿਲਦੀ ਹੈ, ਪੜਾਅ-II (ਮਈ ਤੋਂ) ਵਿੱਚ ਘੱਟ। ਤਾਰੀਖਾਂ ਬਦਲ ਸਕਦੀਆਂ ਹਨ।', noAmt: 'ਹਰ ਬ੍ਰੈਕਟ ਦੀ ਰਕਮ ਪ੍ਰਕਾਸ਼ਿਤ ਨਹੀਂ ਹੈ ਅਤੇ ਪ੍ਰੋਗਰਾਮ ਅਨੁਸਾਰ ਬਦਲਦੀ ਹੈ, ਇਸ ਲਈ ਮੈਂ ਰਕਮ ਨਹੀਂ ਦੱਸਾਂਗਾ।', next: 'ਅਗਲਾ ਕਦਮ: ਆਪਣਾ 12ਵੀਂ ਦਾ ਪ੍ਰਤੀਸ਼ਤ ਅਤੇ ਪ੍ਰੀਖਿਆ ਸਕੋਰ ਦੱਸੋ, ਫਿਰ ਅਧਿਕਾਰਤ ਪੇਜ ਤੇ ਪੁਸ਼ਟੀ ਕਰੋ।', link: 'ਅਧਿਕਾਰਤ ਲਿੰਕ' }
   }[lang];
-  const tail = {
-    en: "\n\nNext step: Share your Class 12 percentage and any entrance score, and check the current slabs on the portal. Slabs change every session.\n\nOfficial link: " + LINKS.admissions,
-    hi: "\n\n**अगला कदम:** 12वीं का प्रतिशत और प्रवेश परीक्षा स्कोर बताएँ, और पोर्टल पर वर्तमान स्लैब देखें।\n\n**आधिकारिक लिंक:** " + LINKS.admissions,
-    hinglish: "\n\nNext step: Class 12 percentage aur entrance score batao, aur portal par current slabs dekho. Slabs har session badalte hain.\n\nOfficial link: " + LINKS.admissions,
-    pa: "\n\n**ਅਗਲਾ ਕਦਮ:** 12ਵੀਂ ਦੇ ਅੰਕ ਅਤੇ ਪ੍ਰੀਖਿਆ ਸਕੋਰ ਦੱਸੋ, ਪੋਰਟਲ 'ਤੇ ਮੌਜੂਦਾ ਸਲੈਬ ਦੇਖੋ।\n\n**ਅਧਿਕਾਰਤ ਲਿੰਕ:** " + LINKS.admissions
-  }[lang];
-  return head + '\n' + rows + tail;
+
+  const lines = [
+    L.head, '', rows, '',
+    `**${L.after12}:** ${b.after_12th_diploma_lateral.join(' | ')}`,
+    `**${L.afterGrad}:** ${b.after_graduation.join(' | ')}`,
+    '',
+    L.noAmt, '',
+    L.phases, '',
+    L.next, '',
+    `${L.link}: ${LINKS.scholarships}`
+  ];
+  return lines.join('\n');
 }
 
 function hostelAnswer(lang) {

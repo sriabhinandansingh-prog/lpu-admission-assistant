@@ -257,7 +257,10 @@ const server = http.createServer(async (req, res) => {
       assistant: 'LPU Admission AssistAI',
       identity: process.env.MODEL_DISPLAY_NAME || (MODEL_API_KEY ? MODEL_NAME : 'retrieval-only'),
       session: KB.meta && KB.meta.session,
-      verified: KB.meta && KB.meta.verified
+      verified: KB.meta && KB.meta.verified,
+      verified_sections: (KB.meta && KB.meta.verified_sections) || [],
+      unverified_sections: (KB.meta && KB.meta.unverified_sections) || [],
+      last_checked: KB.meta && KB.meta.last_checked
     });
   }
 

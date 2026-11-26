@@ -2,7 +2,16 @@
   "meta": {
     "session": "2026-27",
     "verified": false,
-    "note": "Eligibility text here is general guidance only. Fees, cutoffs, deadlines and scholarship slabs are deliberately NOT stored as numbers. Confirm every figure on admission.lpu.in before publishing this site."
+    "note": "Scholarship categories, bracket criteria and phases were read from the official scholarship page on 2026-11-26. Fees, cutoffs and deadlines are deliberately NOT stored as numbers and must be confirmed on admission.lpu.in. Eligibility text is general guidance, not an audited prospectus.",
+    "last_checked": "2026-11-26",
+    "verified_sections": [
+      "scholarships"
+    ],
+    "unverified_sections": [
+      "fees",
+      "cutoffs",
+      "deadlines"
+    ]
   },
   "links": {
     "university": "https://www.lpu.in/",
@@ -245,28 +254,54 @@
   ],
   "scholarships": [
     {
-      "name": "Academic merit",
-      "detail": "Based on Class 12 or qualifying examination marks, on a slab system. The slabs change by session."
+      "name": "Academic merit, after Class 12, diploma or lateral entry",
+      "detail": "Slab-based on your qualifying examination marks. Official brackets: 98% and above is bracket 1, 95% to 97.99% is bracket 2, 90% to 94.99% is bracket 3, and 80% to 89.99% is bracket 4. Each programme offers between one and four brackets, and the concession differs by programme.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
     },
     {
-      "name": "LPUNEST based",
-      "detail": "Based on your LPUNEST score, with higher scores attracting larger concessions."
+      "name": "Academic merit, after graduation (postgraduate programmes)",
+      "detail": "Official brackets for programmes taken after a degree: 95% and above is bracket 1, 90% to 94.99% is bracket 2, 80% to 89.99% is bracket 3, and 70% to 79.99% is bracket 4.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
     },
     {
-      "name": "National level examinations",
-      "detail": "Consideration for students with strong JEE Main, NEET, CAT, MAT, CLAT or similar scores, where the programme accepts them."
+      "name": "LPUNEST score",
+      "detail": "A concession based on your LPUNEST performance. The slabs are published per programme.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
     },
     {
-      "name": "Sports",
-      "detail": "For students with a recognised record at state, national or international level. Trials or certificates are usually required."
+      "name": "National level tests",
+      "detail": "Consideration for scores in JEE (Main), NEET, UCEED, CAT, MAT, GATE and GPAT, where the programme accepts that test.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
     },
     {
-      "name": "Cultural",
-      "detail": "For achievement in performing or creative arts, usually assessed through an audition or portfolio."
+      "name": "Sports, cultural, R&D, co-curricular, social service and bravery awards",
+      "detail": "For a recognised record in sport, performing or creative arts, research and development, co-curricular activity, social service or a bravery award.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
     },
     {
-      "name": "Financial assistance",
-      "detail": "Support for specific categories and circumstances as defined in the current official policy, including defence personnel and sibling concessions where offered."
+      "name": "Innovation, startup and entrepreneurship",
+      "detail": "For applicants with an innovation, startup or entrepreneurial initiative. The application usually describes the venture.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
+    },
+    {
+      "name": "Work experience (MBA)",
+      "detail": "An MBA-specific scholarship linked to relevant work experience.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
+    },
+    {
+      "name": "Doctoral (PhD) scholarship and fee benefits",
+      "detail": "Scholarship and fee benefits set specifically for PhD applicants.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
+    },
+    {
+      "name": "LPU RISE",
+      "detail": "Recognising India's Scholarly Excellence, a special scholarship scheme.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
+    },
+    {
+      "name": "Financial aid and special categories",
+      "detail": "Need-based aid, support for orphans, support for persons with certain disabilities, LPU Rakshak Samman Anudaan and LPU Shikshak Samman Anudaan.",
+      "source_url": "https://www.lpu.in/scholarship/scholarship.php"
     }
   ],
   "hostel": [
@@ -297,5 +332,25 @@
       "q": "How do I check my application status?",
       "a": "Only the official admission portal can show your status. This assistant cannot access or verify applications."
     }
-  ]
+  ],
+  "scholarship_brackets": {
+    "note": "Criteria from the official scholarship page. The concession amount per bracket is not published there and differs by programme, so it is not stored here.",
+    "after_12th_diploma_lateral": [
+      "98% and above",
+      "95% to 97.99%",
+      "90% to 94.99%",
+      "80% to 89.99%"
+    ],
+    "after_graduation": [
+      "95% and above",
+      "90% to 94.99%",
+      "80% to 89.99%",
+      "70% to 79.99%"
+    ],
+    "source_url": "https://www.lpu.in/scholarship/scholarship.php"
+  },
+  "scholarship_phases": {
+    "detail": "Admissions run in phases and the scholarship benefit changes with them. Phase-I opens in January and runs to April and carries the highest benefit. Phase-II starts in May with comparatively lower amounts. The university states these dates are tentative.",
+    "source_url": "https://www.lpu.in/scholarship/scholarship.php"
+  }
 }

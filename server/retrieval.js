@@ -60,9 +60,13 @@ function buildChunks(kb) {
     'Admission process step by step: ' + kb.admission_steps.map((s, i) => `${i + 1}) ${s}`).join(' '),
     kb.links.admissions);
 
+  const bracketText = kb.scholarship_brackets
+    ? ` Brackets after Class 12, diploma or lateral entry: ${kb.scholarship_brackets.after_12th_diploma_lateral.join(', ')}. Brackets after graduation: ${kb.scholarship_brackets.after_graduation.join(', ')}. The concession amount per bracket is not published and differs by programme.`
+    : '';
+  const phaseText = kb.scholarship_phases ? ' ' + kb.scholarship_phases.detail : '';
   push('policy-scholarships', 'policy', 'Scholarships overview and categories',
-    'Scholarships: LPU offers academic merit scholarships based on qualifying examination marks, LPUNEST score based scholarships, consideration for national level examinations such as JEE Main, NEET, CAT, MAT and CLAT where accepted, sports scholarships for recognised state, national or international level records, cultural scholarships assessed by audition or portfolio, and financial assistance for specific categories as defined in the current official policy. No scholarship amount or slab percentage is stored here because the slabs change every session.',
-    kb.links.admissions);
+    'Scholarships: ' + kb.scholarships.map(x => `${x.name}: ${x.detail}`).join(' ') + bracketText + phaseText,
+    kb.links.scholarships);
 
   for (const s of kb.scholarships) {
     push('sch-' + s.name.toLowerCase().replace(/\s+/g, '-'), 'scholarship', s.name + ' scholarship',
