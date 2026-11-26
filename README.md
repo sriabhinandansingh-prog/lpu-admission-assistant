@@ -72,6 +72,12 @@ Endpoints:
 
 Deploying `lpuChat` yourself needs `NVIDIA_API_KEY` saved as an app secret; without it the function still runs, in retrieval-only mode, and every reply is still verified. `lpuVerify` needs no secret at all.
 
+## Topics
+
+[`TOPICS.md`](TOPICS.md) is the topic list this assistant is built around: what it answers
+today, what is queued for data, and the engineering and coding topics the course side needs.
+The same list lives in [`data/topics.json`](data/topics.json) for code to read.
+
 ## Scope: an admission assistant, not a general chatbot
 
 Ask it "what is AI" and it answers like a person, not like a search box:
