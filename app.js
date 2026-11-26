@@ -21,7 +21,7 @@ const SETTINGS_KEY = 'lpu-assistant-settings';
 /* Leave this empty to let each visitor paste their own backend URL in Settings.
    Set it to your deployed backend (see DEPLOY.md) and every visitor uses it,
    with no setup step at all. The model key stays on that server. */
-const DEFAULT_BACKEND = '';
+const DEFAULT_BACKEND = 'https://superagent-c912e94b.base44.app/functions/lpuAssist';
 
 function loadSettings() {
   let s = {};
@@ -376,7 +376,8 @@ function systemPrompt() {
 async function backendReply(question, history) {
   const s = loadSettings();
   const base = s.backendUrl.replace(/\/+$/, '');
-  const res = await fetch(base + '/api/chat', {
+  const url = /\/functions\/[^/]+$/.test(base) ? base : base + '/api/chat';
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
