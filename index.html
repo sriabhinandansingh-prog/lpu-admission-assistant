@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LPU Admission AssistAI</title>
 <meta name="description" content="Virtual admission counsellor for Lovely Professional University. Courses, eligibility, fees, scholarships, hostel and the admission process.">
-<link rel="stylesheet" href="styles.css?v=7">
+<link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
 <header class="topbar">
@@ -17,7 +17,6 @@
     </div>
   </div>
   <div class="topbar-actions">
-    <button id="settingsBtn" class="ghost" type="button" title="Settings">Settings</button>
     <button id="clearBtn" class="ghost" type="button" title="Clear chat">Clear</button>
   </div>
 </header>
@@ -51,9 +50,9 @@
       </ul>
     </div>
     <div class="card">
-      <h2>Modes</h2>
-      <p id="modeStatus" class="muted">Knowledge-base mode. Answers come from <code>data/knowledge.json</code>.</p>
-      <p class="muted small">Add a model key in Settings to let the assistant paraphrase freely. The key stays in this browser only.</p>
+      <h2>How it works</h2>
+      <p class="muted">Answers come from the LPU knowledge base and are written by the assistant's model on the server. Nothing is stored in your browser.</p>
+      <p class="muted small">Fees, cutoffs and deadlines are never guessed. Confirm them on the official portal.</p>
     </div>
     <div class="card">
       <h2>Languages</h2>
@@ -62,33 +61,6 @@
   </aside>
 </main>
 
-<dialog id="settingsDialog">
-  <form method="dialog" id="settingsForm">
-    <h2>Settings</h2>
-    <label>
-      Backend URL <span class="muted small">(recommended: keeps the model key server-side)</span>
-      <input type="url" id="backendUrl" placeholder="https://your-backend.example.com">
-    </label>
-    <label>
-      API key <span class="muted small">(only if you have no backend, stored in this browser only)</span>
-      <input type="password" id="apiKey" placeholder="sk-...">
-    </label>
-    <label>
-      Endpoint
-      <input type="url" id="endpoint" placeholder="https://api.openai.com/v1/chat/completions">
-    </label>
-    <label>
-      Model
-      <input type="text" id="model" placeholder="gpt-4o-mini">
-    </label>
-    <p class="muted small">A backend URL is the safe option: the model key stays on the server and is never sent to a visitor's browser. With neither set, the assistant answers from the bundled knowledge base. Never commit a key to the repository.</p>
-    <menu>
-      <button value="cancel" class="ghost" type="submit">Cancel</button>
-      <button value="save" id="saveSettings" type="submit">Save</button>
-    </menu>
-  </form>
-</dialog>
-
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>
