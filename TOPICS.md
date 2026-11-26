@@ -1,8 +1,8 @@
 # Topics
 
-The topic list this assistant is built around. `data/topics.json` is the same list in
-machine-readable form, so the app or a future version of it can read the topics instead of
-hard-coding them.
+The topic list this assistant is built around: 52 topics in six tiers. `data/topics.json` is
+the same list in machine-readable form, so the app or a future version of it can read the
+topics instead of hard-coding them.
 
 **Status key**
 
@@ -71,6 +71,65 @@ politely instead of turning into a general chatbot. Teaching engineering or codi
 would change that scope, so it waits for an explicit decision. Tier 4 and Tier 5 above are
 about the *course* (what LPU teaches, in which semester, with which labs), which fits the
 admission role and needs no scope change, only data.
+
+## Tier 6: technical and AI concepts (23 topics)
+
+The concepts the owner wants covered: RAG, SLM, architecture, API, REST API, Flask and the
+rest of that world. These are the topics a student asking "yeh chatbot kaise kaam karta hai"
+or "RAG kya hai" lands on, and they are also the stack this project itself runs on
+(retrieval over a knowledge base, an API that verifies every answer, a static site with
+serverless backend functions).
+
+All 23 are `planned`: answering them means study mode, the one scope decision still open.
+Listing them here makes the gap explicit instead of pretending the assistant covers them.
+
+**AI and models**
+
+| Topic | Example questions |
+| --- | --- |
+| LLM | "LLM kya hota hai?", "LLM kaise kaam karta hai?" |
+| SLM (small language models) | "SLM kya hai?", "SLM aur LLM me kya farq hai?" |
+| RAG (retrieval augmented generation) | "RAG kya hai?", "Is app me RAG use hua hai?" |
+| Embeddings and vector search | "Embedding kya hoti hai?", "Vector database kya hai?" |
+| Prompt engineering, context window | "Prompt engineering kya hai?", "Context window kya hai?" |
+| Fine-tuning, training, inference | "Fine-tuning kya hai?", "Temperature kya karta hai?" |
+| Hallucination and verification | "Hallucination kya hai?", "Answer verify kaise karte hain?" |
+
+**Architecture**
+
+| Topic | Example questions |
+| --- | --- |
+| System architecture, client and server | "System architecture kya hoti hai?", "3-tier architecture kya hai?" |
+| Monolith, microservices, MVC | "Microservices kya hain?", "MVC pattern kya hai?" |
+| Request flow: frontend to backend to database | "Browser se request kaise jaati hai?" |
+
+**APIs**
+
+| Topic | Example questions |
+| --- | --- |
+| API basics | "API kya hai?", "API kaise kaam karti hai?" |
+| REST API: methods, endpoints, status codes | "REST API kya hai?", "GET aur POST me difference?" |
+| Authentication and keys | "API key kya hoti hai?", "OAuth kya hai?" |
+| Webhooks, JSON, rate limits | "Webhook kya hai?", "JSON kya hota hai?" |
+| Calling and testing an API | "Postman me API kaise test karein?" |
+
+**Web and backend**
+
+| Topic | Example questions |
+| --- | --- |
+| Flask: routes, requests, responses | "Flask kya hai?", "Flask me route kaise banate hain?" |
+| FastAPI, Django, Node/Express | "Flask aur Django me difference?", "FastAPI kab use karein?" |
+| Frontend: HTML, CSS, JS, hosting | "Static site kya hoti hai?", "GitHub Pages par hosting kaise hoti hai?" |
+
+**Data, deployment and coding logic**
+
+| Topic | Example questions |
+| --- | --- |
+| Databases: SQL, NoSQL, caching | "SQL aur NoSQL me difference?", "Cache kyun use karte hain?" |
+| Docker, CI/CD, serverless | "Docker kya hai?", "Serverless function kaise kaam karta hai?" |
+| DSA and complexity | "Time complexity kaise nikalte hain?", "Recursion samjhao" |
+| OOP and clean code | "OOP ke 4 pillars kya hain?", "Class aur object me difference?" |
+| Debugging and error reading | "Stack trace kya hota hai?", "Error message kaise padhein?" |
 
 ## Adding data to a `needs_data` topic
 

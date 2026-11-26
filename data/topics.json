@@ -3,78 +3,583 @@
     "project": "LPU Admission AssistAI",
     "session": "2026-27",
     "updated": "2026-11-26",
-    "note": "Authoritative topic list for the assistant. 'live' = knowledge base has data today. 'needs_data' = topic is wanted but the facts are not stored yet, so the assistant must say so and point to the official page. 'planned' = later. Never invent a figure, date or cutoff for a needs_data topic."
+    "note": "Authoritative topic list for the assistant. 'live' = knowledge base has data today. 'needs_data' = topic is wanted but the facts are not stored yet, so the assistant must say so and point to the official page. 'planned' = later. Never invent a figure, date or cutoff for a needs_data topic. Tier 6 lists the technical and AI concepts the owner wants covered (RAG, SLM, architecture, API, REST API, Flask and the rest); they stay planned until study mode is switched on."
   },
   "tiers": {
     "1": "Admission core, live today",
     "2": "High demand, data to add next",
     "3": "Later",
     "4": "Engineering concepts",
-    "5": "Coding concepts and logic"
+    "5": "Coding concepts and logic",
+    "6": "Technical and AI concepts: RAG, SLM, architecture, API, REST API, Flask and friends"
   },
   "topics": [
-    { "id": "programmes", "tier": 1, "status": "live", "label": "Programmes and duration",
-      "examples": ["LPU me kaun kaun se course hain?", "B.Tech kitne saal ka hai?", "BBA ya B.Com me kya difference hai?"] },
-    { "id": "eligibility", "tier": 1, "status": "live", "label": "Eligibility per programme",
-      "examples": ["B.Tech ke liye kya chahiye?", "B.Sc ke liye subject required kya hain?", "MBA me fresher apply kar sakta hai?"] },
-    { "id": "admission_steps", "tier": 1, "status": "live", "label": "Admission process step by step",
-      "examples": ["Admission kaise le?", "Registration kaise karna hai?", "Application form me kya bharna hai?"] },
-    { "id": "lpunest", "tier": 1, "status": "live", "label": "LPUNEST and entrance requirement",
-      "examples": ["LPUNEST compulsory hai?", "Entrance exam ke bina admission ho sakta hai?", "JEE Main se admission mil jayega?"] },
-    { "id": "scholarships", "tier": 1, "status": "live", "label": "Scholarships and fee concessions",
-      "examples": ["Scholarship ke liye kya chahiye?", "78% par kitni scholarship milegi?", "LPUNEST score par concession milta hai?"] },
-    { "id": "hostel", "tier": 1, "status": "live", "label": "Hostel, mess and transport",
-      "examples": ["Hostel me AC room milta hai?", "Mess ka kya scene hai?", "Transport facility hai?"] },
-    { "id": "university_basics", "tier": 1, "status": "live", "label": "University basics and official links",
-      "examples": ["LPU kahan hai?", "LPU kab established hua?", "Official website kya hai?"] },
-    { "id": "live_status", "tier": 1, "status": "live", "label": "Live status: admission open, session, notices",
-      "examples": ["Is admission open for 2026?", "Session kaunsa chal raha hai?"] },
-
-    { "id": "fees", "tier": 2, "status": "needs_data", "label": "Fees: programme-wise tuition, hostel and other charges",
-      "examples": ["B.Tech ki fees kitni hai?", "Hostel charges kitne hain?", "Semester wise fees batao"] },
-    { "id": "important_dates", "tier": 2, "status": "needs_data", "label": "Important dates and deadlines",
-      "examples": ["Last date kya hai?", "LPUNEST slot kab hai?", "Counselling kab se hai?"] },
-    { "id": "placements", "tier": 2, "status": "needs_data", "label": "Placements, packages and recruiters",
-      "examples": ["Average package kitna hai?", "Kaunsi companies aati hain?", "CSE ka placement kaisa hai?"] },
-    { "id": "cutoff", "tier": 2, "status": "needs_data", "label": "Cutoff and selection criteria",
-      "examples": ["Cutoff kitna hai?", "Selection kaise hota hai?", "Merit list kab aati hai?"] },
-    { "id": "contact", "tier": 2, "status": "needs_data", "label": "Contact, helpline and campus visit",
-      "examples": ["Helpline number kya hai?", "Campus visit kar sakte hain?", "Counsellor se baat kaise karun?"] },
-    { "id": "documents", "tier": 2, "status": "needs_data", "label": "Documents checklist and application help",
-      "examples": ["Kaunse documents chahiye?", "Migration certificate zaroori hai?", "Photo ka size kya rakhna hai?"] },
-    { "id": "refund", "tier": 2, "status": "needs_data", "label": "Refund and cancellation policy",
-      "examples": ["Admission cancel karne par fees wapas milegi?", "Refund policy kya hai?"] },
-
-    { "id": "comparisons", "tier": 3, "status": "planned", "label": "Programme comparison",
-      "examples": ["B.Tech CSE vs IT me kya better hai?", "BCA ya B.Tech, kaunsa lun?"] },
-    { "id": "lateral_entry", "tier": 3, "status": "planned", "label": "Lateral entry and credit transfer",
-      "examples": ["Diploma ke baad B.Tech me lateral entry milti hai?"] },
-    { "id": "international", "tier": 3, "status": "planned", "label": "International and NRI admission",
-      "examples": ["NRI ke liye process kya hai?", "Foreign student admission kaise le?"] },
-    { "id": "campus_life", "tier": 3, "status": "planned", "label": "Campus life, clubs and sports",
-      "examples": ["Kaunse clubs hain?", "Sports facilities kya hain?"] },
-
-    { "id": "curriculum", "tier": 4, "status": "needs_data", "label": "What you actually study: branch-wise subjects and labs",
-      "examples": ["B.Tech CSE me kya padhaya jata hai?", "First year me common subjects hote hain?", "Kitne labs hote hain?"] },
-    { "id": "specialisations", "tier": 4, "status": "needs_data", "label": "Specialisations inside a branch",
-      "examples": ["CSE me AI/ML specialisation hai?", "Cyber security ka branch hai?", "Cloud computing me course hai?"] },
-    { "id": "engineering_core", "tier": 4, "status": "needs_data", "label": "Engineering fundamentals covered in the course",
-      "examples": ["Engineering drawing aati hai kya?", "Workshop practice hota hai?", "Maths kitne semester tak hai?"] },
-    { "id": "projects_internships", "tier": 4, "status": "needs_data", "label": "Projects, internships and training",
-      "examples": ["Internship college karwata hai?", "Final year project ka kya scene hai?", "Industrial training hoti hai?"] },
-
-    { "id": "coding_from_scratch", "tier": 5, "status": "needs_data", "label": "Coding from scratch: beginner support",
-      "examples": ["Coding nahi aati, phir bhi CSE le sakta hoon?", "Zero se coding sikhate hain?", "Pehle semester me kaunsi language?"] },
-    { "id": "coding_languages", "tier": 5, "status": "needs_data", "label": "Languages taught and when",
-      "examples": ["C, C++ padhate hain?", "Python kab start hoti hai?", "Java course me hai?"] },
-    { "id": "coding_logic", "tier": 5, "status": "needs_data", "label": "Logic building: DSA, problem solving, practice platforms",
-      "examples": ["DSA syllabus me hai?", "Logic building kaise hoti hai?", "Coding practice karwate hain?"] },
-    { "id": "coding_activities", "tier": 5, "status": "needs_data", "label": "Coding clubs, hackathons and contests",
-      "examples": ["Coding club hai?", "Hackathon hota hai?", "Contests me participate kar sakte hain?"] },
-    { "id": "coding_in_selection", "tier": 5, "status": "needs_data", "label": "Coding in selection and placements",
-      "examples": ["LPUNEST me coding section hai?", "Placement me coding round hota hai?", "Coding test ke liye kya prepare karun?"] },
-    { "id": "study_mode", "tier": 5, "status": "planned", "label": "Concept answers (study mode) - needs an explicit scope decision",
-      "examples": ["What is a loop?", "OOP samjhao", "DBMS basics batao"],
-      "note": "The assistant currently refuses non-admission questions by design. Answering engineering or coding concepts directly would widen that scope, so it stays planned until the owner says yes." }
+    {
+      "id": "programmes",
+      "tier": 1,
+      "status": "live",
+      "label": "Programmes and duration",
+      "examples": [
+        "LPU me kaun kaun se course hain?",
+        "B.Tech kitne saal ka hai?",
+        "BBA ya B.Com me kya difference hai?"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "tier": 1,
+      "status": "live",
+      "label": "Eligibility per programme",
+      "examples": [
+        "B.Tech ke liye kya chahiye?",
+        "B.Sc ke liye subject required kya hain?",
+        "MBA me fresher apply kar sakta hai?"
+      ]
+    },
+    {
+      "id": "admission_steps",
+      "tier": 1,
+      "status": "live",
+      "label": "Admission process step by step",
+      "examples": [
+        "Admission kaise le?",
+        "Registration kaise karna hai?",
+        "Application form me kya bharna hai?"
+      ]
+    },
+    {
+      "id": "lpunest",
+      "tier": 1,
+      "status": "live",
+      "label": "LPUNEST and entrance requirement",
+      "examples": [
+        "LPUNEST compulsory hai?",
+        "Entrance exam ke bina admission ho sakta hai?",
+        "JEE Main se admission mil jayega?"
+      ]
+    },
+    {
+      "id": "scholarships",
+      "tier": 1,
+      "status": "live",
+      "label": "Scholarships and fee concessions",
+      "examples": [
+        "Scholarship ke liye kya chahiye?",
+        "78% par kitni scholarship milegi?",
+        "LPUNEST score par concession milta hai?"
+      ]
+    },
+    {
+      "id": "hostel",
+      "tier": 1,
+      "status": "live",
+      "label": "Hostel, mess and transport",
+      "examples": [
+        "Hostel me AC room milta hai?",
+        "Mess ka kya scene hai?",
+        "Transport facility hai?"
+      ]
+    },
+    {
+      "id": "university_basics",
+      "tier": 1,
+      "status": "live",
+      "label": "University basics and official links",
+      "examples": [
+        "LPU kahan hai?",
+        "LPU kab established hua?",
+        "Official website kya hai?"
+      ]
+    },
+    {
+      "id": "live_status",
+      "tier": 1,
+      "status": "live",
+      "label": "Live status: admission open, session, notices",
+      "examples": [
+        "Is admission open for 2026?",
+        "Session kaunsa chal raha hai?"
+      ]
+    },
+    {
+      "id": "fees",
+      "tier": 2,
+      "status": "needs_data",
+      "label": "Fees: programme-wise tuition, hostel and other charges",
+      "examples": [
+        "B.Tech ki fees kitni hai?",
+        "Hostel charges kitne hain?",
+        "Semester wise fees batao"
+      ]
+    },
+    {
+      "id": "important_dates",
+      "tier": 2,
+      "status": "needs_data",
+      "label": "Important dates and deadlines",
+      "examples": [
+        "Last date kya hai?",
+        "LPUNEST slot kab hai?",
+        "Counselling kab se hai?"
+      ]
+    },
+    {
+      "id": "placements",
+      "tier": 2,
+      "status": "needs_data",
+      "label": "Placements, packages and recruiters",
+      "examples": [
+        "Average package kitna hai?",
+        "Kaunsi companies aati hain?",
+        "CSE ka placement kaisa hai?"
+      ]
+    },
+    {
+      "id": "cutoff",
+      "tier": 2,
+      "status": "needs_data",
+      "label": "Cutoff and selection criteria",
+      "examples": [
+        "Cutoff kitna hai?",
+        "Selection kaise hota hai?",
+        "Merit list kab aati hai?"
+      ]
+    },
+    {
+      "id": "contact",
+      "tier": 2,
+      "status": "needs_data",
+      "label": "Contact, helpline and campus visit",
+      "examples": [
+        "Helpline number kya hai?",
+        "Campus visit kar sakte hain?",
+        "Counsellor se baat kaise karun?"
+      ]
+    },
+    {
+      "id": "documents",
+      "tier": 2,
+      "status": "needs_data",
+      "label": "Documents checklist and application help",
+      "examples": [
+        "Kaunse documents chahiye?",
+        "Migration certificate zaroori hai?",
+        "Photo ka size kya rakhna hai?"
+      ]
+    },
+    {
+      "id": "refund",
+      "tier": 2,
+      "status": "needs_data",
+      "label": "Refund and cancellation policy",
+      "examples": [
+        "Admission cancel karne par fees wapas milegi?",
+        "Refund policy kya hai?"
+      ]
+    },
+    {
+      "id": "comparisons",
+      "tier": 3,
+      "status": "planned",
+      "label": "Programme comparison",
+      "examples": [
+        "B.Tech CSE vs IT me kya better hai?",
+        "BCA ya B.Tech, kaunsa lun?"
+      ]
+    },
+    {
+      "id": "lateral_entry",
+      "tier": 3,
+      "status": "planned",
+      "label": "Lateral entry and credit transfer",
+      "examples": [
+        "Diploma ke baad B.Tech me lateral entry milti hai?"
+      ]
+    },
+    {
+      "id": "international",
+      "tier": 3,
+      "status": "planned",
+      "label": "International and NRI admission",
+      "examples": [
+        "NRI ke liye process kya hai?",
+        "Foreign student admission kaise le?"
+      ]
+    },
+    {
+      "id": "campus_life",
+      "tier": 3,
+      "status": "planned",
+      "label": "Campus life, clubs and sports",
+      "examples": [
+        "Kaunse clubs hain?",
+        "Sports facilities kya hain?"
+      ]
+    },
+    {
+      "id": "curriculum",
+      "tier": 4,
+      "status": "needs_data",
+      "label": "What you actually study: branch-wise subjects and labs",
+      "examples": [
+        "B.Tech CSE me kya padhaya jata hai?",
+        "First year me common subjects hote hain?",
+        "Kitne labs hote hain?"
+      ]
+    },
+    {
+      "id": "specialisations",
+      "tier": 4,
+      "status": "needs_data",
+      "label": "Specialisations inside a branch",
+      "examples": [
+        "CSE me AI/ML specialisation hai?",
+        "Cyber security ka branch hai?",
+        "Cloud computing me course hai?"
+      ]
+    },
+    {
+      "id": "engineering_core",
+      "tier": 4,
+      "status": "needs_data",
+      "label": "Engineering fundamentals covered in the course",
+      "examples": [
+        "Engineering drawing aati hai kya?",
+        "Workshop practice hota hai?",
+        "Maths kitne semester tak hai?"
+      ]
+    },
+    {
+      "id": "projects_internships",
+      "tier": 4,
+      "status": "needs_data",
+      "label": "Projects, internships and training",
+      "examples": [
+        "Internship college karwata hai?",
+        "Final year project ka kya scene hai?",
+        "Industrial training hoti hai?"
+      ]
+    },
+    {
+      "id": "coding_from_scratch",
+      "tier": 5,
+      "status": "needs_data",
+      "label": "Coding from scratch: beginner support",
+      "examples": [
+        "Coding nahi aati, phir bhi CSE le sakta hoon?",
+        "Zero se coding sikhate hain?",
+        "Pehle semester me kaunsi language?"
+      ]
+    },
+    {
+      "id": "coding_languages",
+      "tier": 5,
+      "status": "needs_data",
+      "label": "Languages taught and when",
+      "examples": [
+        "C, C++ padhate hain?",
+        "Python kab start hoti hai?",
+        "Java course me hai?"
+      ]
+    },
+    {
+      "id": "coding_logic",
+      "tier": 5,
+      "status": "needs_data",
+      "label": "Logic building: DSA, problem solving, practice platforms",
+      "examples": [
+        "DSA syllabus me hai?",
+        "Logic building kaise hoti hai?",
+        "Coding practice karwate hain?"
+      ]
+    },
+    {
+      "id": "coding_activities",
+      "tier": 5,
+      "status": "needs_data",
+      "label": "Coding clubs, hackathons and contests",
+      "examples": [
+        "Coding club hai?",
+        "Hackathon hota hai?",
+        "Contests me participate kar sakte hain?"
+      ]
+    },
+    {
+      "id": "coding_in_selection",
+      "tier": 5,
+      "status": "needs_data",
+      "label": "Coding in selection and placements",
+      "examples": [
+        "LPUNEST me coding section hai?",
+        "Placement me coding round hota hai?",
+        "Coding test ke liye kya prepare karun?"
+      ]
+    },
+    {
+      "id": "study_mode",
+      "tier": 5,
+      "status": "planned",
+      "label": "Concept answers (study mode) - needs an explicit scope decision",
+      "examples": [
+        "What is a loop?",
+        "OOP samjhao",
+        "DBMS basics batao"
+      ],
+      "note": "The assistant currently refuses non-admission questions by design. Answering engineering or coding concepts directly would widen that scope, so it stays planned until the owner says yes."
+    },
+    {
+      "id": "ai_llm",
+      "tier": 6,
+      "status": "planned",
+      "label": "LLM: large language models",
+      "examples": [
+        "LLM kya hota hai?",
+        "LLM kaise kaam karta hai?",
+        "LLM aur GPT me difference kya hai?"
+      ]
+    },
+    {
+      "id": "ai_slm",
+      "tier": 6,
+      "status": "planned",
+      "label": "SLM: small language models",
+      "examples": [
+        "SLM kya hai?",
+        "SLM aur LLM me kya farq hai?",
+        "Chhota model kahan use karte hain?"
+      ]
+    },
+    {
+      "id": "ai_rag",
+      "tier": 6,
+      "status": "planned",
+      "label": "RAG: retrieval augmented generation",
+      "examples": [
+        "RAG kya hai?",
+        "RAG kaise kaam karta hai?",
+        "RAG aur fine-tuning me kya better hai?",
+        "Is app me RAG use hua hai?"
+      ]
+    },
+    {
+      "id": "ai_embeddings",
+      "tier": 6,
+      "status": "planned",
+      "label": "Embeddings and vector search",
+      "examples": [
+        "Embedding kya hoti hai?",
+        "Vector database kya hai?",
+        "Similarity search kaise hota hai?"
+      ]
+    },
+    {
+      "id": "ai_prompting",
+      "tier": 6,
+      "status": "planned",
+      "label": "Prompt engineering and context window",
+      "examples": [
+        "Prompt engineering kya hai?",
+        "System prompt kya hota hai?",
+        "Context window kya hai?"
+      ]
+    },
+    {
+      "id": "ai_finetuning",
+      "tier": 6,
+      "status": "planned",
+      "label": "Fine-tuning, training and inference",
+      "examples": [
+        "Fine-tuning kya hai?",
+        "Training aur inference me difference?",
+        "Temperature parameter kya karta hai?"
+      ]
+    },
+    {
+      "id": "ai_hallucination",
+      "tier": 6,
+      "status": "planned",
+      "label": "Hallucination, grounding and verification",
+      "examples": [
+        "Hallucination kya hai?",
+        "AI galat jawab kyun deta hai?",
+        "Answer verify kaise karte hain?"
+      ]
+    },
+    {
+      "id": "arch_system",
+      "tier": 6,
+      "status": "planned",
+      "label": "System architecture: client, server, layers",
+      "examples": [
+        "System architecture kya hoti hai?",
+        "Client-server architecture samjhao",
+        "3-tier architecture kya hai?"
+      ]
+    },
+    {
+      "id": "arch_patterns",
+      "tier": 6,
+      "status": "planned",
+      "label": "Architecture patterns: monolith, microservices, MVC",
+      "examples": [
+        "Microservices kya hain?",
+        "Monolith aur microservices me difference?",
+        "MVC pattern kya hai?"
+      ]
+    },
+    {
+      "id": "arch_flow",
+      "tier": 6,
+      "status": "planned",
+      "label": "Request flow: frontend to backend to database",
+      "examples": [
+        "Browser se request kaise jaati hai?",
+        "Frontend backend se kaise baat karta hai?",
+        "Data flow samjhao"
+      ]
+    },
+    {
+      "id": "api_basics",
+      "tier": 6,
+      "status": "planned",
+      "label": "API basics",
+      "examples": [
+        "API kya hai?",
+        "API kaise kaam karti hai?",
+        "API aur web page me difference?"
+      ]
+    },
+    {
+      "id": "api_rest",
+      "tier": 6,
+      "status": "planned",
+      "label": "REST API: methods, endpoints, status codes",
+      "examples": [
+        "REST API kya hai?",
+        "GET aur POST me difference?",
+        "200, 404, 500 ka matlab kya hai?"
+      ]
+    },
+    {
+      "id": "api_auth",
+      "tier": 6,
+      "status": "planned",
+      "label": "API authentication and keys",
+      "examples": [
+        "API key kya hoti hai?",
+        "OAuth kya hai?",
+        "Token based auth kaise hota hai?"
+      ]
+    },
+    {
+      "id": "api_webhooks",
+      "tier": 6,
+      "status": "planned",
+      "label": "Webhooks, JSON and rate limits",
+      "examples": [
+        "Webhook kya hai?",
+        "JSON kya hota hai?",
+        "Rate limit kyun lagti hai?"
+      ]
+    },
+    {
+      "id": "api_testing",
+      "tier": 6,
+      "status": "planned",
+      "label": "Calling and testing an API",
+      "examples": [
+        "Postman me API kaise test karein?",
+        "API response kaise padhein?",
+        "curl se request kaise bhejein?"
+      ]
+    },
+    {
+      "id": "web_flask",
+      "tier": 6,
+      "status": "planned",
+      "label": "Flask: routes, requests, responses",
+      "examples": [
+        "Flask kya hai?",
+        "Flask me route kaise banate hain?",
+        "Flask aur Django me difference?"
+      ]
+    },
+    {
+      "id": "web_frameworks",
+      "tier": 6,
+      "status": "planned",
+      "label": "Backend frameworks: FastAPI, Django, Node/Express",
+      "examples": [
+        "FastAPI kab use karein?",
+        "Django kya hai?",
+        "Node.js backend kya hota hai?"
+      ]
+    },
+    {
+      "id": "web_frontend",
+      "tier": 6,
+      "status": "planned",
+      "label": "Frontend basics: HTML, CSS, JavaScript, hosting",
+      "examples": [
+        "Static site kya hoti hai?",
+        "GitHub Pages par site kaise host hoti hai?",
+        "JavaScript frontend se API kaise call karein?"
+      ]
+    },
+    {
+      "id": "data_db",
+      "tier": 6,
+      "status": "planned",
+      "label": "Databases: SQL, NoSQL, caching",
+      "examples": [
+        "SQL aur NoSQL me difference?",
+        "Database index kya hota hai?",
+        "Cache kyun use karte hain?"
+      ]
+    },
+    {
+      "id": "infra_deploy",
+      "tier": 6,
+      "status": "planned",
+      "label": "Deployment: Docker, CI/CD, serverless functions",
+      "examples": [
+        "Docker kya hai?",
+        "CI/CD pipeline kya hota hai?",
+        "Serverless function kaise kaam karta hai?"
+      ]
+    },
+    {
+      "id": "code_dsa",
+      "tier": 6,
+      "status": "planned",
+      "label": "Coding logic: DSA and complexity",
+      "examples": [
+        "Time complexity kaise nikalte hain?",
+        "Array aur linked list me difference?",
+        "Recursion samjhao"
+      ]
+    },
+    {
+      "id": "code_oop",
+      "tier": 6,
+      "status": "planned",
+      "label": "OOP and clean code",
+      "examples": [
+        "OOP ke 4 pillars kya hain?",
+        "Class aur object me difference?",
+        "Inheritance ka use kab karein?"
+      ]
+    },
+    {
+      "id": "code_debug",
+      "tier": 6,
+      "status": "planned",
+      "label": "Debugging and error reading",
+      "examples": [
+        "Error message kaise padhein?",
+        "Stack trace kya hota hai?",
+        "Bug kaise dhundhein?"
+      ]
+    }
   ]
 }
