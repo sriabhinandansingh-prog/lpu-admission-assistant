@@ -166,15 +166,19 @@ const ALIAS: Record<string, string[]> = {
 /* Longest alias wins, so "mba" is never read as "ba" and "bba" not as "ba". */
 function programmeInQuestion(question: string, kb: any) {
   const t = " " + question.toLowerCase().replace(/[^a-z0-9. ]/g, " ").replace(/\s+/g, " ") + " ";
-  const squash = t.replace(/ /g, "");
+  const tokens = new Set(t.split(" ").filter(Boolean));
+  const nodots = new Set(Array.from(tokens).map((x) => x.replace(/\./g, "")));
+  const squash = t.replace(/[. ]/g, "");
   let best: any = null;
   let bestLen = 0;
   for (const p of kb.programmes || []) {
     const keys = (ALIAS[p.id] || []).concat([String(p.name).toLowerCase()]);
     for (const k of keys) {
-      const needle = k.replace(/ /g, "");
+      const needle = k.replace(/[. ]/g, "");
       if (!needle) continue;
-      if ((squash.includes(needle) || t.includes(" " + k + " ")) && needle.length > bestLen) {
+      /* Short aliases must be a whole word, or "batao" reads as B.A. */
+      const hit = needle.length <= 4 ? nodots.has(needle) : squash.includes(needle);
+      if (hit && needle.length > bestLen) {
         best = p;
         bestLen = needle.length;
       }

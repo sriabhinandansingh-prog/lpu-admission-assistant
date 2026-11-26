@@ -32,7 +32,7 @@ const VERIFY_ENDPOINT = 'https://superagent-a46bd31e.base44.app/functions/lpuVer
 
 
 /* ---------- language ---------- */
-const HINGLISH = /\b(kya|kaise|kaisi|kitna|kitni|kitne|hai|hain|nahi|nahin|mera|meri|mujhe|batao|bataiye|chahiye|karna|karni|hoga|hogi|kaun|kab|kahan|acha|thik|bhai|dost|krna|krni|kro|bta)\b/i;
+const HINGLISH = /\b(kya|kaise|kaisi|kitna|kitni|kitne|hai|hain|nahi|nahin|mera|meri|mujhe|batao|bataiye|bta|daso|das|ki|da|de|ho|hunda|kive|kiven|changa|vadia|chahiye|karna|karni|hoga|hogi|kaun|kab|kahan|acha|thik|bhai|dost|krna|krni|kro)\b/i;
 
 function detectLanguage(text) {
   if (/[\u0A00-\u0A7F]/.test(text)) return 'pa';
@@ -68,7 +68,9 @@ function detectIntent(text) {
 function findProgramme(text) {
   if (!KB) return null;
   const t = ' ' + text.toLowerCase().replace(/[^a-z0-9. ]/g, ' ').replace(/\s+/g, ' ') + ' ';
-  const squash = t.replace(/ /g, '');
+  const tokens = new Set(t.split(' ').filter(Boolean));
+  const nodots = new Set(Array.from(tokens).map(x => x.replace(/\./g, '')));
+  const squash = t.replace(/[. ]/g, '');
   const alias = {
     btech: ['b.tech', 'btech', 'b tech', 'engineering'],
     bca: ['bca'],
@@ -93,9 +95,11 @@ function findProgramme(text) {
   for (const p of KB.programmes) {
     const keys = (alias[p.id] || []).concat([p.name.toLowerCase()]);
     for (const k of keys) {
-      const needle = k.replace(/ /g, '');
+      const needle = k.replace(/[. ]/g, '');
       if (!needle) continue;
-      const hit = squash.includes(needle) || t.includes(' ' + k + ' ');
+      /* Short aliases ("ba", "ma", "bsc") must be a whole word, otherwise
+         "batao" would be read as B.A. Long ones may sit inside the text. */
+      const hit = needle.length <= 4 ? nodots.has(needle) : squash.includes(needle);
       if (hit && needle.length > bestLen) {
         best = p;
         bestLen = needle.length;
